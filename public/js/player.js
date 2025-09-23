@@ -14,7 +14,7 @@ class Player {
     this.velocityX = 0;
     this.velocityY = 0;
     this.maxSpeed = 3;
-    this.acceleration = 0.2;
+    this.acceleration = 0.5;
     this.friction = 0.9;
     
     // Game stats
