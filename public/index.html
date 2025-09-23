@@ -1,11 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blob.io</title>
+  <title>Blob.io - Juego Multijugador</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  
+  <!-- Menu Principal -->
+  <div id="mainMenu" class="menu-container">
+    <div class="menu-content">
+      <h1 class="game-title">BLOB.IO</h1>
+      <div class="menu-form">
+        <input type="text" id="playerName" placeholder="Ingresa tu nombre" maxlength="15">
+        <button id="playButton" class="play-btn">JUGAR</button>
+      </div>
+      <div class="game-info">
+        <h3>Cómo jugar:</h3>
+        <ul>
+          <li>Mueve tu blob con el mouse</li>
+          <li>Come puntos pequeños para crecer</li>
+          <li>Evita blobs más grandes</li>
+          <li>¡Intenta llegar al primer lugar!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interfaz del Juego -->
+  <div id="gameContainer" class="game-container hidden">
+    <!-- HUD Superior -->
+    <div class="game-hud">
+      <div class="hud-left">
+        <div class="score-display">
+          <span class="score-label">Puntuación:</span>
+          <span id="playerScore">0</span>
+        </div>
+        <div class="player-info">
+          <span class="player-label">Jugador:</span>
+          <span id="playerNameDisplay"></span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <button id="pauseButton" class="control-btn">⏸</button>
+        <button id="exitButton" class="control-btn">🏠</button>
+      </div>
+    </div>
+
+    <!-- Canvas del Juego -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Minimap -->
+    <div class="minimap-container">
+      <canvas id="minimap"></canvas>
+    </div>
+
+    <!-- Tabla de Posiciones -->
+    <div class="leaderboard">
+      <h3>Clasificación</h3>
+      <ol id="leaderboardList">
+        <!-- Se llenará dinámicamente -->
+      </ol>
+    </div>
+  </div>
+
+  <!-- Menu de Pausa -->
+  <div id="pauseMenu" class="overlay-menu hidden">
+    <div class="menu-content">
+      <h2>Juego Pausado</h2>
+      <button id="resumeButton" class="menu-btn">Continuar</button>
+      <button id="restartButton" class="menu-btn">Reiniciar</button>
+      <button id="homeButton" class="menu-btn">Menú Principal</button>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameOverMenu" class="overlay-menu hidden">
+    <div class="menu-content">
+      <h2>¡Juego Terminado!</h2>
+      <div class="final-stats">
+        <p>Puntuación Final: <span id="finalScore">0</span></p>
+        <p>Posición: <span id="finalPosition">-</span></p>
+        <p>Tiempo jugado: <span id="gameTime">0:00</span></p>
+      </div>
+      <button id="playAgainButton" class="menu-btn">Jugar de Nuevo</button>
+      <button id="backToMenuButton" class="menu-btn">Menú Principal</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/game.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/food.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
