@@ -1,0 +1,102 @@
+{
+  "players": [
+    {
+      "id": "player_001",
+      "username": "TestPlayer1",
+      "email": "test1@example.com",
+      "createdAt": "2024-01-15T10:30:00Z",
+      "lastLogin": "2024-01-20T14:45:00Z",
+      "stats": {
+        "totalGames": 25,
+        "totalWins": 5,
+        "bestScore": 2850,
+        "totalPlayTime": 7200000,
+        "averageScore": 1245,
+        "level": 8,
+        "experience": 1520
+      },
+      "preferences": {
+        "soundEnabled": true,
+        "musicVolume": 0.7,
+        "sfxVolume": 0.8,
+        "theme": "dark",
+        "language": "es"
+      },
+      "achievements": [
+        "first_game",
+        "score_1000",
+        "survival_10min"
+      ],
+      "isActive": true,
+      "profilePicture": null
+    },
+    {
+      "id": "player_002", 
+      "username": "ProGamer",
+      "email": "pro@example.com",
+      "createdAt": "2024-01-10T08:15:00Z",
+      "lastLogin": "2024-01-21T16:30:00Z",
+      "stats": {
+        "totalGames": 150,
+        "totalWins": 35,
+        "bestScore": 5200,
+        "totalPlayTime": 54000000,
+        "averageScore": 1850,
+        "level": 15,
+        "experience": 4250
+      },
+      "preferences": {
+        "soundEnabled": true,
+        "musicVolume": 0.5,
+        "sfxVolume": 0.9,
+        "theme": "neon",
+        "language": "es"
+      },
+      "achievements": [
+        "first_game",
+        "score_1000",
+        "score_3000",
+        "score_5000",
+        "survival_10min",
+        "survival_30min",
+        "winner_streak_5"
+      ],
+      "isActive": true,
+      "profilePicture": "avatar_02.png"
+    },
+    {
+      "id": "player_003",
+      "username": "CasualGamer",
+      "email": "casual@example.com", 
+      "createdAt": "2024-01-18T20:10:00Z",
+      "lastLogin": "2024-01-21T19:20:00Z",
+      "stats": {
+        "totalGames": 8,
+        "totalWins": 1,
+        "bestScore": 1120,
+        "totalPlayTime": 1800000,
+        "averageScore": 650,
+        "level": 3,
+        "experience": 280
+      },
+      "preferences": {
+        "soundEnabled": false,
+        "musicVolume": 0.3,
+        "sfxVolume": 0.5,
+        "theme": "light",
+        "language": "es"
+      },
+      "achievements": [
+        "first_game",
+        "score_1000"
+      ],
+      "isActive": true,
+      "profilePicture": null
+    }
+  ],
+  "metadata": {
+    "totalPlayers": 3,
+    "lastUpdated": "2024-01-21T20:00:00Z",
+    "version": "1.0.0"
+  }
+}

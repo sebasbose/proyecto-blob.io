@@ -1,0 +1,168 @@
+{
+  "globalStats": {
+    "totalPlayersRegistered": 3,
+    "totalGamesPlayed": 183,
+    "totalPlayTime": 63000000,
+    "averageGameDuration": 1230000,
+    "highestScore": 5200,
+    "mostActivePlayer": "player_002",
+    "peakConcurrentPlayers": 25,
+    "dailyActiveUsers": 8,
+    "weeklyActiveUsers": 15,
+    "monthlyActiveUsers": 45,
+    "lastUpdated": "2024-01-21T20:00:00Z"
+  },
+  "leaderboards": {
+    "allTime": [
+      {
+        "rank": 1,
+        "playerId": "player_002",
+        "playerName": "ProGamer",
+        "score": 5200,
+        "achievedAt": "2024-01-21T16:52:45Z"
+      },
+      {
+        "rank": 2,
+        "playerId": "player_001", 
+        "playerName": "TestPlayer1",
+        "score": 2850,
+        "achievedAt": "2024-01-19T15:20:30Z"
+      },
+      {
+        "rank": 3,
+        "playerId": "player_003",
+        "playerName": "CasualGamer",
+        "score": 1120,
+        "achievedAt": "2024-01-20T21:15:45Z"
+      }
+    ],
+    "weekly": [
+      {
+        "rank": 1,
+        "playerId": "player_002",
+        "playerName": "ProGamer",
+        "score": 5200,
+        "achievedAt": "2024-01-21T16:52:45Z"
+      },
+      {
+        "rank": 2,
+        "playerId": "player_001",
+        "playerName": "TestPlayer1", 
+        "score": 1850,
+        "achievedAt": "2024-01-21T14:45:30Z"
+      },
+      {
+        "rank": 3,
+        "playerId": "player_003",
+        "playerName": "CasualGamer",
+        "score": 650,
+        "achievedAt": "2024-01-21T19:18:15Z"
+      }
+    ],
+    "daily": [
+      {
+        "rank": 1,
+        "playerId": "player_002",
+        "playerName": "ProGamer",
+        "score": 5200,
+        "achievedAt": "2024-01-21T16:52:45Z"
+      },
+      {
+        "rank": 2,
+        "playerId": "player_001",
+        "playerName": "TestPlayer1",
+        "score": 1850,
+        "achievedAt": "2024-01-21T14:45:30Z"
+      }
+    ]
+  },
+  "achievements": {
+    "definitions": [
+      {
+        "id": "first_game",
+        "name": "Primer Juego",
+        "description": "Completa tu primer juego",
+        "icon": "🎮",
+        "points": 10,
+        "rarity": "common"
+      },
+      {
+        "id": "score_1000", 
+        "name": "Mil Puntos",
+        "description": "Alcanza 1000 puntos en un juego",
+        "icon": "🎯",
+        "points": 25,
+        "rarity": "common"
+      },
+      {
+        "id": "score_3000",
+        "name": "Tres Mil Puntos", 
+        "description": "Alcanza 3000 puntos en un juego",
+        "icon": "⭐",
+        "points": 50,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "score_5000",
+        "name": "Cinco Mil Puntos",
+        "description": "Alcanza 5000 puntos en un juego",
+        "icon": "💎",
+        "points": 100,
+        "rarity": "rare"
+      },
+      {
+        "id": "survival_10min",
+        "name": "Superviviente",
+        "description": "Sobrevive 10 minutos en un juego",
+        "icon": "⏰",
+        "points": 30,
+        "rarity": "common"
+      },
+      {
+        "id": "survival_30min",
+        "name": "Superviviente Experto",
+        "description": "Sobrevive 30 minutos en un juego",
+        "icon": "🛡️",
+        "points": 75,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "winner_streak_5",
+        "name": "Racha Ganadora",
+        "description": "Gana 5 juegos consecutivos",
+        "icon": "🔥",
+        "points": 150,
+        "rarity": "epic"
+      }
+    ],
+    "playerProgress": {
+      "player_001": [
+        { "achievementId": "first_game", "unlockedAt": "2024-01-15T10:45:00Z" },
+        { "achievementId": "score_1000", "unlockedAt": "2024-01-16T14:20:00Z" },
+        { "achievementId": "survival_10min", "unlockedAt": "2024-01-17T16:30:00Z" }
+      ],
+      "player_002": [
+        { "achievementId": "first_game", "unlockedAt": "2024-01-10T08:30:00Z" },
+        { "achievementId": "score_1000", "unlockedAt": "2024-01-10T09:15:00Z" },
+        { "achievementId": "score_3000", "unlockedAt": "2024-01-12T11:45:00Z" },
+        { "achievementId": "score_5000", "unlockedAt": "2024-01-21T16:35:20Z" },
+        { "achievementId": "survival_10min", "unlockedAt": "2024-01-10T08:45:00Z" },
+        { "achievementId": "survival_30min", "unlockedAt": "2024-01-14T20:15:00Z" },
+        { "achievementId": "winner_streak_5", "unlockedAt": "2024-01-18T19:30:00Z" }
+      ],
+      "player_003": [
+        { "achievementId": "first_game", "unlockedAt": "2024-01-18T20:25:00Z" },
+        { "achievementId": "score_1000", "unlockedAt": "2024-01-20T21:15:45Z" }
+      ]
+    }
+  },
+  "serverStats": {
+    "uptime": 2592000000,
+    "totalRequests": 15420,
+    "averageResponseTime": 45,
+    "errorRate": 0.002,
+    "peakMemoryUsage": 125.5,
+    "activeSessions": 3,
+    "lastRestart": "2024-01-01T00:00:00Z"
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "games": [
+    {
+      "id": "game_001",
+      "playerId": "player_001",
+      "playerName": "TestPlayer1",
+      "startTime": "2024-01-21T14:30:00Z",
+      "endTime": "2024-01-21T14:45:30Z",
+      "duration": 930000,
+      "finalScore": 1850,
+      "finalRank": 3,
+      "maxRadius": 45,
+      "foodEaten": 125,
+      "playersEaten": 2,
+      "timesEaten": 1,
+      "gameMode": "classic",
+      "worldSize": {
+        "width": 3000,
+        "height": 3000
+      },
+      "playerCount": 12,
+      "gameEvents": [
+        {
+          "type": "game_start",
+          "timestamp": "2024-01-21T14:30:00Z",
+          "data": { "initialPosition": { "x": 1500, "y": 1200 } }
+        },
+        {
+          "type": "player_eaten",
+          "timestamp": "2024-01-21T14:37:15Z", 
+          "data": { "victimId": "bot_005", "score": 850 }
+        },
+        {
+          "type": "eaten_by_player",
+          "timestamp": "2024-01-21T14:43:20Z",
+          "data": { "killerId": "player_002", "finalScore": 1850 }
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "game_002",
+      "playerId": "player_002",
+      "playerName": "ProGamer",
+      "startTime": "2024-01-21T16:15:00Z",
+      "endTime": "2024-01-21T16:52:45Z",
+      "duration": 2265000,
+      "finalScore": 5200,
+      "finalRank": 1,
+      "maxRadius": 95,
+      "foodEaten": 450,
+      "playersEaten": 8,
+      "timesEaten": 0,
+      "gameMode": "classic",
+      "worldSize": {
+        "width": 3000,
+        "height": 3000
+      },
+      "playerCount": 15,
+      "gameEvents": [
+        {
+          "type": "game_start",
+          "timestamp": "2024-01-21T16:15:00Z",
+          "data": { "initialPosition": { "x": 800, "y": 2100 } }
+        },
+        {
+          "type": "achievement_unlocked",
+          "timestamp": "2024-01-21T16:35:20Z",
+          "data": { "achievement": "score_5000", "score": 5000 }
+        },
+        {
+          "type": "game_won",
+          "timestamp": "2024-01-21T16:52:45Z",
+          "data": { "finalScore": 5200, "rank": 1 }
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "game_003",
+      "playerId": "player_003",
+      "playerName": "CasualGamer",
+      "startTime": "2024-01-21T19:10:00Z",
+      "endTime": "2024-01-21T19:18:15Z",
+      "duration": 495000,
+      "finalScore": 650,
+      "finalRank": 8,
+      "maxRadius": 28,
+      "foodEaten": 45,
+      "playersEaten": 0,
+      "timesEaten": 1,
+      "gameMode": "classic",
+      "worldSize": {
+        "width": 3000,
+        "height": 3000
+      },
+      "playerCount": 10,
+      "gameEvents": [
+        {
+          "type": "game_start",
+          "timestamp": "2024-01-21T19:10:00Z",
+          "data": { "initialPosition": { "x": 2200, "y": 900 } }
+        },
+        {
+          "type": "eaten_by_player",
+          "timestamp": "2024-01-21T19:18:15Z",
+          "data": { "killerId": "bot_003", "finalScore": 650 }
+        }
+      ],
+      "status": "completed"
+    }
+  ],
+  "activeGames": [
+    {
+      "id": "game_004",
+      "playerId": "player_001",
+      "playerName": "TestPlayer1",
+      "startTime": "2024-01-21T20:05:00Z",
+      "currentScore": 950,
+      "currentRank": 5,
+      "currentRadius": 32,
+      "gameMode": "classic",
+      "playerCount": 8,
+      "status": "active"
+    }
+  ],
+  "metadata": {
+    "totalGames": 3,
+    "totalActiveGames": 1,
+    "lastUpdated": "2024-01-21T20:10:00Z",
+    "averageGameDuration": 1230000,
+    "version": "1.0.0"
+  }
+}
