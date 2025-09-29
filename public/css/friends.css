@@ -1,5 +1,9 @@
 /* Estilos específicos para la página de Amigos */
 
+body {
+  overflow-y: auto;
+}
+
 /* Navegación Superior */
 .top-nav {
   position: fixed;

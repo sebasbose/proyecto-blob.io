@@ -1,5 +1,9 @@
 /* Estilos específicos para la página de Leaderboards */
 
+body {
+  overflow-y: auto;
+}
+
 /* Navegación Superior */
 .top-nav {
   position: fixed;
@@ -161,6 +165,7 @@
 }
 
 .podium-place {
+  width: 250px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 30px 20px 20px;

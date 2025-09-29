@@ -1,5 +1,9 @@
 /* Estilos específicos para la página de Perfil */
 
+body {
+  overflow-y: auto;
+}
+
 /* Navegación Superior */
 .top-nav {
   position: fixed;
@@ -82,17 +86,16 @@
 .profile-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding-top: 70px;
 }
 
 /* Header del Perfil */
 .profile-header {
   position: relative;
-  margin-bottom: 40px;
+  margin-bottom: -150px;
 }
 
 .profile-banner {
-  height: 200px;
+  height: 250px;
   background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
   position: relative;
   overflow: hidden;
@@ -110,11 +113,11 @@
 .profile-info {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 20px;
   display: flex;
   align-items: end;
   gap: 30px;
-  transform: translateY(-50px);
+  transform: translateY(-200px);
   flex-wrap: wrap;
 }
 
