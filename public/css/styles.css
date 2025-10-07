@@ -101,7 +101,7 @@ body {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
-.play-btn, .menu-btn, .control-btn {
+.play-btn, .menu-btn, .auth-btn, .control-btn {
   padding: 15px 30px;
   font-size: 1.2em;
   font-weight: bold;
@@ -116,7 +116,7 @@ body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.play-btn:hover, .menu-btn:hover {
+.play-btn:hover, .menu-btn:hover, .auth-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
@@ -156,6 +156,20 @@ body {
   left: 0;
   color: #ff6b6b;
   font-weight: bold;
+}
+
+.auth-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.auth-btn {
+  display: block;
+  margin: 10px auto;
+  font-size: .75em !important;
+  width: 150px;
 }
 
 /* Contenedor del Juego */
@@ -569,13 +583,13 @@ body {
   left: 2px;
 }
 
-.forgot-password, .terms-link, .switch-link {
+.forgot-password, .terms-link, .privacy-link, .switch-link {
   color: #4ecdc4;
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
-.forgot-password:hover, .terms-link:hover, .switch-link:hover {
+.forgot-password:hover, .terms-link:hover, .privacy-link:hover, .switch-link:hover {
   color: #ff6b6b;
   text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
 }

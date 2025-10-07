@@ -13,6 +13,8 @@ class UI {
     this.elements.mainMenu = document.getElementById('mainMenu');
     this.elements.playerNameInput = document.getElementById('playerName');
     this.elements.playButton = document.getElementById('playButton');
+    this.elements.loginButton = document.getElementById('loginButton');
+    this.elements.registerButton = document.getElementById('registerButton');
     
     // Game container and HUD
     this.elements.gameContainer = document.getElementById('gameContainer');
@@ -50,6 +52,14 @@ class UI {
       if (e.key === 'Enter') {
         this.startGame();
       }
+    });
+
+    this.elements.loginButton.addEventListener('click', () => {
+      window.location.href = '/login.html';
+    });
+
+    this.elements.registerButton.addEventListener('click', () => {
+      window.location.href = '/register.html';
     });
 
     // Game controls
