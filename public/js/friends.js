@@ -411,7 +411,7 @@ class FriendsManager {
     const colors = {
       online: '#4caf50',
       playing: '#ff9800',
-      offline: '#757575'
+      offline: '#b11010'
     };
     return colors[status] || colors.offline;
   }

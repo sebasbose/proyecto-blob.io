@@ -8,8 +8,12 @@ body {
 .friends-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding-top: 90px;
+  padding-top: 40px;
   padding-bottom: 40px;
+}
+
+.page-header {
+  padding: 0 20px 20px;
 }
 
 /* Navegación de Secciones */
@@ -178,7 +182,7 @@ body {
 }
 
 .status-offline {
-  background: #757575;
+  background: #b11010;
 }
 
 .friend-stats {
@@ -244,7 +248,7 @@ body {
   position: relative;
 }
 
-.filter-btn {
+.action-btn, .filter-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 20px;
@@ -257,7 +261,7 @@ body {
   gap: 8px;
 }
 
-.filter-btn:hover {
+.action-btn:hover, .filter-btn:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
