@@ -13,12 +13,15 @@ class UI {
     this.elements.mainMenu = document.getElementById('mainMenu');
     this.elements.playerNameInput = document.getElementById('playerName');
     this.elements.playButton = document.getElementById('playButton');
+    this.elements.loginButton = document.getElementById('loginButton');
+    this.elements.registerButton = document.getElementById('registerButton');
     
     // Game container and HUD
     this.elements.gameContainer = document.getElementById('gameContainer');
     this.elements.playerScore = document.getElementById('playerScore');
     this.elements.playerNameDisplay = document.getElementById('playerNameDisplay');
     this.elements.pauseButton = document.getElementById('pauseButton');
+    this.elements.profileButton = document.getElementById('profileButton');
     this.elements.exitButton = document.getElementById('exitButton');
     
     // Leaderboard
@@ -51,9 +54,21 @@ class UI {
       }
     });
 
+    this.elements.loginButton.addEventListener('click', () => {
+      window.location.href = '/login.html';
+    });
+
+    this.elements.registerButton.addEventListener('click', () => {
+      window.location.href = '/register.html';
+    });
+
     // Game controls
     this.elements.pauseButton.addEventListener('click', () => {
       this.togglePause();
+    });
+
+    this.elements.profileButton.addEventListener('click', () => {
+      this.showConfirmExit('profile');
     });
 
     this.elements.exitButton.addEventListener('click', () => {
@@ -230,7 +245,7 @@ class UI {
     this.startLeaderboardUpdates();
   }
 
-  goToMainMenu() {
+  exitGame(popToView) {
     game.stop();
     this.hideAllScreens();
     this.elements.mainMenu.classList.remove('hidden');
@@ -240,11 +255,15 @@ class UI {
     // Clear the name input for fresh start
     this.elements.playerNameInput.value = '';
     this.elements.playerNameInput.focus();
+
+    if (popToView === 'profile') {
+      window.location.href = '/profile.html';
+    }
   }
 
-  showConfirmExit() {
+  showConfirmExit(popToView = null) {
     if (confirm('¿Estás seguro de que quieres salir del juego?')) {
-      this.goToMainMenu();
+      this.exitGame(popToView);
     }
   }
 

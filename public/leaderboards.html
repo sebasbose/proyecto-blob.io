@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboards Globales - Blob.io</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/leaderboards.css">
+  <script src="https://kit.fontawesome.com/62f4d88379.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Navegación Superior -->
+  <nav class="top-nav">
+    <div class="nav-content">
+      <div class="nav-left">
+        <a href="index.html" class="logo">
+          <h2 class="game-title-small">BLOB.IO</h2>
+        </a>
+      </div>
+      <div class="nav-center">
+        <ul class="nav-links">
+          <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+          <li><a href="leaderboards.html" class="active"><i class="fas fa-trophy"></i> Rankings</a></li>
+          <li><a href="profile.html"><i class="fas fa-user"></i> Perfil</a></li>
+          <li><a href="friends.html"><i class="fas fa-users"></i> Amigos</a></li>
+        </ul>
+      </div>
+      <div class="nav-right">
+        <div class="user-info">
+          <span class="username">SebasPlayer</span>
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenedor Principal -->
+  <div class="leaderboards-container">
+    <div class="page-header">
+      <h1 class="page-title">
+        <i class="fas fa-trophy"></i>
+        Leaderboards Globales
+      </h1>
+      <p class="page-subtitle">Los mejores jugadores de Blob.io</p>
+    </div>
+
+    <!-- Filtros y Categorías -->
+    <div class="leaderboard-controls">
+      <div class="time-filters">
+        <button class="filter-btn active" data-period="all">Todo el Tiempo</button>
+        <button class="filter-btn" data-period="monthly">Mensual</button>
+        <button class="filter-btn" data-period="weekly">Semanal</button>
+        <button class="filter-btn" data-period="daily">Diario</button>
+      </div>
+      <div class="category-filters">
+        <button class="category-btn active" data-category="score">
+          <i class="fas fa-star"></i> Puntuación
+        </button>
+        <button class="category-btn" data-category="time">
+          <i class="fas fa-clock"></i> Tiempo
+        </button>
+        <button class="category-btn" data-category="wins">
+          <i class="fas fa-crown"></i> Victorias
+        </button>
+      </div>
+    </div>
+
+    <!-- Podium de Top 3 -->
+    <div class="podium-section">
+      <div class="podium">
+        <!-- Segundo Lugar -->
+        <div class="podium-place second">
+          <div class="podium-player">
+            <div class="player-avatar silver">
+              <div class="blob-avatar" style="background: linear-gradient(45deg, #4ecdc4, #45b7d1);"></div>
+            </div>
+            <h3 class="player-name">ProGamer99</h3>
+            <p class="player-score">125,847</p>
+            <div class="player-stats">
+              <span><i class="fas fa-trophy"></i> 48 victorias</span>
+            </div>
+          </div>
+          <div class="place-number">2</div>
+        </div>
+
+        <!-- Primer Lugar -->
+        <div class="podium-place first">
+          <div class="podium-player">
+            <div class="player-avatar gold">
+              <div class="blob-avatar" style="background: linear-gradient(45deg, #ff6b6b, #ffa726);"></div>
+            </div>
+            <h3 class="player-name">BlobMaster</h3>
+            <p class="player-score">156,923</p>
+            <div class="player-stats">
+              <span><i class="fas fa-trophy"></i> 73 victorias</span>
+            </div>
+          </div>
+          <div class="place-number">1</div>
+        </div>
+
+        <!-- Tercer Lugar -->
+        <div class="podium-place third">
+          <div class="podium-player">
+            <div class="player-avatar bronze">
+              <div class="blob-avatar" style="background: linear-gradient(45deg, #96ceb4, #66bb6a);"></div>
+            </div>
+            <h3 class="player-name">CellEater</h3>
+            <p class="player-score">98,742</p>
+            <div class="player-stats">
+              <span><i class="fas fa-trophy"></i> 31 victorias</span>
+            </div>
+          </div>
+          <div class="place-number">3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Rankings -->
+    <div class="rankings-section">
+      <div class="rankings-header">
+        <h2>Top 100 Jugadores</h2>
+        <div class="search-container">
+          <input type="text" id="playerSearch" placeholder="Buscar jugador...">
+          <i class="fas fa-search"></i>
+        </div>
+      </div>
+
+      <div class="rankings-table-container">
+        <table class="rankings-table">
+          <thead>
+            <tr>
+              <th>Posición</th>
+              <th>Jugador</th>
+              <th>Puntuación Máxima</th>
+              <th>Victorias</th>
+              <th>Tiempo Total</th>
+              <th>Última Actividad</th>
+            </tr>
+          </thead>
+          <tbody id="rankingsTableBody">
+            <!-- Se llenará dinámicamente con JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination">
+        <button class="page-btn" id="prevPage" disabled>
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="page-info">
+          <span id="currentPage">1</span> / <span id="totalPages">10</span>
+        </div>
+        <button class="page-btn" id="nextPage">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Estadísticas Globales -->
+    <div class="global-stats">
+      <h2>Estadísticas Globales</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-content">
+            <h3>Jugadores Totales</h3>
+            <p class="stat-number">47,892</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-gamepad"></i>
+          </div>
+          <div class="stat-content">
+            <h3>Partidas Jugadas</h3>
+            <p class="stat-number">2,341,567</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-content">
+            <h3>Tiempo Total</h3>
+            <p class="stat-number">98,764h</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="stat-content">
+            <h3>Puntuación Promedio</h3>
+            <p class="stat-number">3,247</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <div class="footer-content">
+      <p>&copy; 2024 Blob.io - Desarrollado para CI-0137 Desarrollo Web</p>
+      <div class="footer-links">
+        <a href="#"><i class="fab fa-github"></i></a>
+        <a href="#"><i class="fab fa-discord"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/navigation.js"></script>
+  <script src="js/leaderboards.js"></script>
+</body>
+</html>

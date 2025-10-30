@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Blob.io</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <script src="https://kit.fontawesome.com/62f4d88379.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Contenedor de Login -->
+  <div id="loginContainer" class="menu-container">
+    <div class="menu-content auth-form">
+      <h1 class="game-title">BLOB.IO</h1>
+      <h2 class="auth-subtitle">Iniciar Sesión</h2>
+      
+      <form id="loginForm" class="auth-form-container">
+        <div class="input-group">
+          <i class="fa-solid fa-user input-icon"></i>
+          <input type="text" id="loginUsername" placeholder="Usuario o Email" required>
+        </div>
+        
+        <div class="input-group">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="loginPassword" placeholder="Contraseña" required>
+        </div>
+        
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" id="rememberMe">
+            <span class="checkmark"></span>
+            Recordarme
+          </label>
+          <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+        </div>
+        
+        <button type="submit" class="play-btn auth-btn">INICIAR SESIÓN</button>
+        
+        <div class="auth-switch">
+          <p>¿No tienes cuenta? <a href="register.html" class="switch-link">Regístrate aquí</a></p>
+        </div>
+        
+        <div class="back-to-game">
+          <a href="index.html" class="menu-btn">
+            <i class="fa-solid fa-arrow-left"></i> Volver al Juego
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

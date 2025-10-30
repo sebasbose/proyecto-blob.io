@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil - Blob.io</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/profile.css">
+  <script src="https://kit.fontawesome.com/62f4d88379.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Navegación Superior -->
+  <nav class="top-nav">
+    <div class="nav-content">
+      <div class="nav-left">
+        <a href="index.html" class="logo">
+          <h2 class="game-title-small">BLOB.IO</h2>
+        </a>
+      </div>
+      <div class="nav-center">
+        <ul class="nav-links">
+          <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+          <li><a href="leaderboards.html"><i class="fas fa-trophy"></i> Rankings</a></li>
+          <li><a href="profile.html" class="active"><i class="fas fa-user"></i> Perfil</a></li>
+          <li><a href="friends.html"><i class="fas fa-users"></i> Amigos</a></li>
+        </ul>
+      </div>
+      <div class="nav-right">
+        <div class="user-info">
+          <span class="username">SebasPlayer</span>
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenedor Principal del Perfil -->
+  <div class="profile-container">
+    <!-- Header del Perfil -->
+    <div class="profile-header">
+      <div class="profile-banner">
+        <div class="banner-gradient"></div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-avatar">
+          <div class="avatar-blob" id="userBlob"></div>
+          <button class="edit-avatar-btn" title="Cambiar avatar">
+            <i class="fas fa-camera"></i>
+          </button>
+        </div>
+        <div class="profile-details">
+          <h1 class="display-username">SebasPlayer</h1>
+          <p class="user-title">Blob Master</p>
+          <div class="profile-stats-quick">
+            <div class="quick-stat">
+              <span class="stat-value">15,847</span>
+              <span class="stat-label">Puntuación Máxima</span>
+            </div>
+            <div class="quick-stat">
+              <span class="stat-value">#47</span>
+              <span class="stat-label">Ranking Global</span>
+            </div>
+            <div class="quick-stat">
+              <span class="stat-value">23</span>
+              <span class="stat-label">Victorias</span>
+            </div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="action-btn primary" id="editProfileBtn">
+            <i class="fas fa-edit"></i> Editar Perfil
+          </button>
+          <button class="action-btn secondary" id="shareProfileBtn">
+            <i class="fas fa-share"></i> Compartir
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="profile-content">
+      <!-- Navegación de Tabs -->
+      <div class="profile-tabs">
+        <button class="tab-btn active" data-tab="overview">
+          <i class="fas fa-chart-area"></i> Resumen
+        </button>
+        <button class="tab-btn" data-tab="statistics">
+          <i class="fas fa-chart-bar"></i> Estadísticas
+        </button>
+        <button class="tab-btn" data-tab="achievements">
+          <i class="fas fa-medal"></i> Logros
+        </button>
+        <button class="tab-btn" data-tab="history">
+          <i class="fas fa-history"></i> Historial
+        </button>
+        <button class="tab-btn" data-tab="settings">
+          <i class="fas fa-cog"></i> Configuración
+        </button>
+      </div>
+
+      <!-- Tab Content: Resumen -->
+      <div class="tab-content active" id="overview">
+        <div class="overview-grid">
+          <!-- Estadísticas Generales -->
+          <div class="stats-card">
+            <h3><i class="fas fa-chart-line"></i> Estadísticas Generales</h3>
+            <div class="stats-list">
+              <div class="stat-item">
+                <span class="stat-icon"><i class="fas fa-star"></i></span>
+                <span class="stat-name">Puntuación Total</span>
+                <span class="stat-value">347,291</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon"><i class="fas fa-gamepad"></i></span>
+                <span class="stat-name">Partidas Jugadas</span>
+                <span class="stat-value">156</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon"><i class="fas fa-clock"></i></span>
+                <span class="stat-name">Tiempo Total</span>
+                <span class="stat-value">47h 23m</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon"><i class="fas fa-trophy"></i></span>
+                <span class="stat-name">Victorias</span>
+                <span class="stat-value">23</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon"><i class="fas fa-percentage"></i></span>
+                <span class="stat-name">Tasa de Victoria</span>
+                <span class="stat-value">14.7%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progreso de Nivel -->
+          <div class="level-card">
+            <h3><i class="fas fa-level-up-alt"></i> Progreso de Nivel</h3>
+            <div class="level-info">
+              <div class="level-number">
+                <span class="current-level">24</span>
+                <span class="level-label">Nivel</span>
+              </div>
+              <div class="level-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 67%"></div>
+                </div>
+                <div class="progress-text">
+                  <span>6,750 / 10,000 XP</span>
+                  <span>67%</span>
+                </div>
+              </div>
+            </div>
+            <p class="next-level">3,250 XP para el siguiente nivel</p>
+          </div>
+
+          <!-- Logros Recientes -->
+          <div class="recent-achievements">
+            <h3><i class="fas fa-medal"></i> Logros Recientes</h3>
+            <div class="achievement-list">
+              <div class="achievement-item">
+                <div class="achievement-icon gold">
+                  <i class="fas fa-crown"></i>
+                </div>
+                <div class="achievement-info">
+                  <h4>Rey del Blob</h4>
+                  <p>Alcanza el primer lugar 5 veces</p>
+                  <span class="achievement-date">Hace 2 días</span>
+                </div>
+              </div>
+              <div class="achievement-item">
+                <div class="achievement-icon silver">
+                  <i class="fas fa-target"></i>
+                </div>
+                <div class="achievement-info">
+                  <h4>Comedor Experto</h4>
+                  <p>Come 1000 puntos de comida</p>
+                  <span class="achievement-date">Hace 1 semana</span>
+                </div>
+              </div>
+              <div class="achievement-item">
+                <div class="achievement-icon bronze">
+                  <i class="fas fa-hourglass"></i>
+                </div>
+                <div class="achievement-info">
+                  <h4>Maratonista</h4>
+                  <p>Juega por 30 minutos seguidos</p>
+                  <span class="achievement-date">Hace 2 semanas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Partidas Recientes -->
+          <div class="recent-matches">
+            <h3><i class="fas fa-history"></i> Últimas Partidas</h3>
+            <div class="matches-list">
+              <div class="match-item">
+                <div class="match-result win">
+                  <i class="fas fa-trophy"></i>
+                </div>
+                <div class="match-info">
+                  <div class="match-score">8,547</div>
+                  <div class="match-position">#1 / 12 jugadores</div>
+                  <div class="match-time">Hace 2 horas</div>
+                </div>
+                <div class="match-duration">4m 32s</div>
+              </div>
+              <div class="match-item">
+                <div class="match-result loss">
+                  <i class="fas fa-skull"></i>
+                </div>
+                <div class="match-info">
+                  <div class="match-score">3,421</div>
+                  <div class="match-position">#7 / 15 jugadores</div>
+                  <div class="match-time">Hace 1 día</div>
+                </div>
+                <div class="match-duration">2m 18s</div>
+              </div>
+              <div class="match-item">
+                <div class="match-result win">
+                  <i class="fas fa-trophy"></i>
+                </div>
+                <div class="match-info">
+                  <div class="match-score">12,893</div>
+                  <div class="match-position">#2 / 18 jugadores</div>
+                  <div class="match-time">Hace 2 días</div>
+                </div>
+                <div class="match-duration">7m 45s</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Estadísticas -->
+      <div class="tab-content" id="statistics">
+        <div class="statistics-grid">
+          <!-- Gráfico de Progreso -->
+          <div class="chart-card">
+            <h3>Progreso de Puntuación</h3>
+            <div class="chart-placeholder">
+              <canvas id="scoreChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+
+          <!-- Estadísticas Detalladas -->
+          <div class="detailed-stats">
+            <h3>Estadísticas Detalladas</h3>
+            <div class="stats-categories">
+              <div class="stat-category">
+                <h4>Rendimiento</h4>
+                <div class="stat-row">
+                  <span>Puntuación Promedio</span>
+                  <span>4,237</span>
+                </div>
+                <div class="stat-row">
+                  <span>Mejor Racha</span>
+                  <span>5 victorias</span>
+                </div>
+                <div class="stat-row">
+                  <span>Tiempo Promedio de Vida</span>
+                  <span>3m 45s</span>
+                </div>
+              </div>
+              <div class="stat-category">
+                <h4>Combate</h4>
+                <div class="stat-row">
+                  <span>Jugadores Eliminados</span>
+                  <span>89</span>
+                </div>
+                <div class="stat-row">
+                  <span>Veces Eliminado</span>
+                  <span>133</span>
+                </div>
+                <div class="stat-row">
+                  <span>K/D Ratio</span>
+                  <span>0.67</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Logros -->
+      <div class="tab-content" id="achievements">
+        <div class="achievements-section">
+          <div class="achievements-header">
+            <h3>Colección de Logros</h3>
+            <div class="achievements-progress">
+              <span>12 / 24 logros desbloqueados</span>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 50%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="achievements-grid" id="achievementsGrid">
+            <!-- Se llenará dinámicamente -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Historial -->
+      <div class="tab-content" id="history">
+        <div class="history-section">
+          <div class="history-filters">
+            <select id="historyFilter">
+              <option value="all">Todas las partidas</option>
+              <option value="wins">Solo victorias</option>
+              <option value="top3">Top 3</option>
+              <option value="recent">Últimas 24h</option>
+            </select>
+            <input type="date" id="dateFilter">
+          </div>
+          <div class="history-table">
+            <table id="historyTable">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Puntuación</th>
+                  <th>Posición</th>
+                  <th>Duración</th>
+                  <th>Jugadores</th>
+                  <th>Resultado</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <!-- Se llenará dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Configuración -->
+      <div class="tab-content" id="settings">
+        <div class="settings-section">
+          <div class="settings-grid">
+            <div class="settings-card">
+              <h3><i class="fas fa-user-edit"></i> Información Personal</h3>
+              <form class="settings-form">
+                <div class="form-group">
+                  <label for="usernameInput">Nombre de Usuario</label>
+                  <input type="text" id="usernameInput" value="SebasPlayer" maxlength="15">
+                </div>
+                <div class="form-group">
+                  <label for="emailInput">Correo Electrónico</label>
+                  <input type="email" id="emailInput" value="sebas@example.com">
+                </div>
+                <div class="form-group">
+                  <label for="bioInput">Biografía</label>
+                  <textarea id="bioInput" rows="3" placeholder="Cuéntanos sobre ti...">Jugador apasionado de Blob.io desde 2024</textarea>
+                </div>
+              </form>
+            </div>
+
+            <div class="settings-card">
+              <h3><i class="fas fa-gamepad"></i> Configuración de Juego</h3>
+              <form class="settings-form">
+                <div class="form-group">
+                  <label for="colorScheme">Esquema de Colores</label>
+                  <select id="colorScheme">
+                    <option value="random">Aleatorio</option>
+                    <option value="blue">Azul</option>
+                    <option value="red">Rojo</option>
+                    <option value="green">Verde</option>
+                    <option value="purple">Morado</option>
+                  </select>
+                </div>
+                <div class="form-group checkbox-group">
+                  <input type="checkbox" id="showGrid" checked>
+                  <label for="showGrid">Mostrar cuadrícula</label>
+                </div>
+                <div class="form-group checkbox-group">
+                  <input type="checkbox" id="showNames" checked>
+                  <label for="showNames">Mostrar nombres de jugadores</label>
+                </div>
+                <div class="form-group checkbox-group">
+                  <input type="checkbox" id="soundEffects" checked>
+                  <label for="soundEffects">Efectos de sonido</label>
+                </div>
+              </form>
+            </div>
+
+            <div class="settings-card">
+              <h3><i class="fas fa-shield-alt"></i> Privacidad</h3>
+              <form class="settings-form">
+                <div class="form-group checkbox-group">
+                  <input type="checkbox" id="profilePublic" checked>
+                  <label for="profilePublic">Perfil público</label>
+                </div>
+                <div class="form-group checkbox-group">
+                  <input type="checkbox" id="showOnline">
+                  <label for="showOnline">Mostrar estado en línea</label>
+                </div>
+                <div class="form-group checkbox-group">
+                  <input type="checkbox" id="allowFriendRequests" checked>
+                  <label for="allowFriendRequests">Permitir solicitudes de amistad</label>
+                </div>
+              </form>
+            </div>
+
+            <div class="settings-card">
+              <h3><i class="fas fa-download"></i> Datos</h3>
+              <div class="data-actions">
+                <button class="action-btn secondary">
+                  <i class="fas fa-download"></i> Exportar Datos
+                </button>
+                <button class="action-btn danger">
+                  <i class="fas fa-trash"></i> Eliminar Cuenta
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <button class="action-btn primary" id="saveSettings">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+            <button class="action-btn secondary" id="resetSettings">
+              <i class="fas fa-undo"></i> Restablecer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Edición de Avatar -->
+  <div class="modal" id="avatarModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Personalizar Avatar</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="avatar-customizer">
+          <div class="avatar-preview">
+            <div class="avatar-blob" id="previewBlob"></div>
+          </div>
+          <div class="avatar-options">
+            <h4>Colores</h4>
+            <div class="color-palette">
+              <button class="color-option" data-color="red" style="background: #ff6b6b;"></button>
+              <button class="color-option" data-color="blue" style="background: #4ecdc4;"></button>
+              <button class="color-option" data-color="green" style="background: #96ceb4;"></button>
+              <button class="color-option" data-color="purple" style="background: #ab47bc;"></button>
+              <button class="color-option" data-color="orange" style="background: #ffa726;"></button>
+              <button class="color-option" data-color="pink" style="background: #ec407a;"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn primary" id="saveAvatar">Guardar</button>
+        <button class="action-btn secondary" id="cancelAvatar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/navigation.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amigos - Blob.io</title>
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/friends.css">
+  <script src="https://kit.fontawesome.com/62f4d88379.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Navegación Superior -->
+  <nav class="top-nav">
+    <div class="nav-content">
+      <div class="nav-left">
+        <a href="index.html" class="logo">
+          <h2 class="game-title-small">BLOB.IO</h2>
+        </a>
+      </div>
+      <div class="nav-center">
+        <ul class="nav-links">
+          <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+          <li><a href="leaderboards.html"><i class="fas fa-trophy"></i> Rankings</a></li>
+          <li><a href="profile.html"><i class="fas fa-user"></i> Perfil</a></li>
+          <li><a href="friends.html" class="active"><i class="fas fa-users"></i> Amigos</a></li>
+        </ul>
+      </div>
+      <div class="nav-right">
+        <div class="user-info">
+          <span class="username">SebasPlayer</span>
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenedor Principal -->
+  <div class="friends-container">
+    <div class="page-header">
+      <h1 class="page-title">
+        <i class="fas fa-users"></i>
+        Centro de Amigos
+      </h1>
+      <p class="page-subtitle">Conecta y juega con otros jugadores de Blob.io</p>
+    </div>
+
+    <!-- Navegación de Secciones -->
+    <div class="friends-nav">
+      <button class="nav-btn active" data-section="friends">
+        <i class="fas fa-users"></i>
+        <span>Mis Amigos</span>
+        <span class="count-badge">12</span>
+      </button>
+      <button class="nav-btn" data-section="search">
+        <i class="fas fa-search"></i>
+        <span>Buscar</span>
+      </button>
+      <button class="nav-btn" data-section="requests">
+        <i class="fas fa-user-plus"></i>
+        <span>Solicitudes</span>
+        <span class="count-badge notification">3</span>
+      </button>
+      <button class="nav-btn" data-section="blocked">
+        <i class="fas fa-user-slash"></i>
+        <span>Bloqueados</span>
+        <span class="count-badge">1</span>
+      </button>
+    </div>
+
+    <!-- Sección: Mis Amigos -->
+    <div class="friends-section active" id="friends-section">
+      <div class="section-header">
+        <h2>Mis Amigos (12)</h2>
+        <div class="friends-actions">
+          <div class="filter-dropdown">
+            <button class="filter-btn">
+              <i class="fas fa-filter"></i>
+              Filtrar
+            </button>
+            <div class="dropdown-content">
+              <a href="#" data-filter="all">Todos</a>
+              <a href="#" data-filter="online">En línea</a>
+              <a href="#" data-filter="playing">Jugando</a>
+              <a href="#" data-filter="offline">Desconectado</a>
+            </div>
+          </div>
+          <button class="action-btn secondary" id="inviteAllBtn">
+            <i class="fas fa-paper-plane"></i>
+            Invitar a todos
+          </button>
+        </div>
+      </div>
+
+      <div class="friends-grid" id="friendsList">
+        <!-- Se llenará dinámicamente -->
+      </div>
+    </div>
+
+    <!-- Sección: Buscar Amigos -->
+    <div class="friends-section" id="search-section">
+      <div class="section-header">
+        <h2>Buscar Jugadores</h2>
+      </div>
+
+      <div class="search-container">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Buscar por nombre de usuario...">
+          <button class="search-btn" id="searchBtn">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+        <div class="search-filters">
+          <button class="filter-tag active" data-search-filter="all">Todos</button>
+          <button class="filter-tag" data-search-filter="online">En línea</button>
+          <button class="filter-tag" data-search-filter="level">Por nivel</button>
+          <button class="filter-tag" data-search-filter="recent">Jugadores recientes</button>
+        </div>
+      </div>
+
+      <div class="search-results" id="searchResults">
+        <!-- Se llenará dinámicamente -->
+      </div>
+
+      <!-- Sugerencias -->
+      <div class="suggestions-section">
+        <h3><i class="fas fa-lightbulb"></i> Jugadores Sugeridos</h3>
+        <div class="suggestions-grid" id="suggestedPlayers">
+          <!-- Se llenará dinámicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Solicitudes de Amistad -->
+    <div class="friends-section" id="requests-section">
+      <div class="section-header">
+        <h2>Solicitudes de Amistad</h2>
+        <div class="requests-actions">
+          <button class="action-btn secondary" id="acceptAllBtn">
+            <i class="fas fa-check-double"></i>
+            Aceptar todas
+          </button>
+          <button class="action-btn danger" id="rejectAllBtn">
+            <i class="fas fa-times"></i>
+            Rechazar todas
+          </button>
+        </div>
+      </div>
+
+      <!-- Solicitudes Recibidas -->
+      <div class="requests-subsection">
+        <h3>Solicitudes Recibidas (3)</h3>
+        <div class="requests-list" id="incomingRequests">
+          <!-- Se llenará dinámicamente -->
+        </div>
+      </div>
+
+      <!-- Solicitudes Enviadas -->
+      <div class="requests-subsection">
+        <h3>Solicitudes Enviadas (2)</h3>
+        <div class="requests-list" id="outgoingRequests">
+          <!-- Se llenará dinámicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Jugadores Bloqueados -->
+    <div class="friends-section" id="blocked-section">
+      <div class="section-header">
+        <h2>Jugadores Bloqueados (1)</h2>
+        <p class="section-description">Los jugadores bloqueados no pueden enviarte mensajes ni solicitudes de amistad.</p>
+      </div>
+
+      <div class="blocked-list" id="blockedList">
+        <!-- Se llenará dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Perfil de Jugador -->
+  <div class="modal" id="playerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalPlayerName">Nombre del Jugador</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="player-profile-mini">
+          <div class="player-avatar-large">
+            <div class="avatar-blob" id="modalPlayerAvatar"></div>
+          </div>
+          <div class="player-stats-modal">
+            <div class="stat-row">
+              <span class="stat-label">Nivel:</span>
+              <span class="stat-value" id="modalPlayerLevel">--</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Puntuación Máxima:</span>
+              <span class="stat-value" id="modalPlayerScore">--</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Victorias:</span>
+              <span class="stat-value" id="modalPlayerWins">--</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Última vez en línea:</span>
+              <span class="stat-value" id="modalPlayerLastSeen">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn primary" id="modalAddFriend">
+          <i class="fas fa-user-plus"></i> Agregar Amigo
+        </button>
+        <button class="action-btn secondary" id="modalViewProfile">
+          <i class="fas fa-eye"></i> Ver Perfil
+        </button>
+        <button class="action-btn secondary" id="modalInviteGame">
+          <i class="fas fa-gamepad"></i> Invitar a Jugar
+        </button>
+        <button class="action-btn danger" id="modalBlockUser">
+          <i class="fas fa-ban"></i> Bloquear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Invitación a Partida -->
+  <div class="modal" id="gameInviteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Invitar a Partida</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="invite-options">
+          <h4>Selecciona el tipo de partida:</h4>
+          <div class="game-mode-options">
+            <label class="game-mode-option">
+              <input type="radio" name="gameMode" value="classic" checked>
+              <div class="option-content">
+                <i class="fas fa-circle"></i>
+                <span>Clásico</span>
+                <p>Partida estándar de Blob.io</p>
+              </div>
+            </label>
+            <label class="game-mode-option">
+              <input type="radio" name="gameMode" value="team">
+              <div class="option-content">
+                <i class="fas fa-users"></i>
+                <span>En Equipo</span>
+                <p>Juega junto a tu amigo</p>
+              </div>
+            </label>
+            <label class="game-mode-option">
+              <input type="radio" name="gameMode" value="private">
+              <div class="option-content">
+                <i class="fas fa-lock"></i>
+                <span>Sala Privada</span>
+                <p>Solo ustedes dos</p>
+              </div>
+            </label>
+          </div>
+          <div class="invite-message">
+            <label for="inviteMessageText">Mensaje (opcional):</label>
+            <textarea id="inviteMessageText" placeholder="¡Ven a jugar conmigo!"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn primary" id="sendInvite">
+          <i class="fas fa-paper-plane"></i> Enviar Invitación
+        </button>
+        <button class="action-btn secondary" id="cancelInvite">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toastContainer">
+    <!-- Las notificaciones aparecerán aquí -->
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/navigation.js"></script>
+  <script src="js/friends.js"></script>
+</body>
+</html>

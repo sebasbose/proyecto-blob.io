@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Blob.io</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <script src="https://kit.fontawesome.com/62f4d88379.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Contenedor de Registro -->
+  <div id="registerContainer" class="menu-container">
+    <div class="menu-content auth-form">
+      <h1 class="game-title">BLOB.IO</h1>
+      <h2 class="auth-subtitle">Crear Cuenta</h2>
+      
+      <form id="registerForm" class="auth-form-container">
+        <div class="input-group">
+          <i class="fa-solid fa-user input-icon"></i>
+          <input type="text" id="registerUsername" placeholder="Nombre de usuario" required minlength="3" maxlength="15">
+        </div>
+        
+        <div class="input-group">
+          <i class="fa-solid fa-envelope input-icon"></i>
+          <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
+        </div>
+        
+        <div class="input-group">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="registerPassword" placeholder="Contraseña" required minlength="6">
+        </div>
+        
+        <div class="input-group">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required>
+        </div>
+        
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" id="acceptTerms" required>
+            <span class="checkmark"></span>
+            <p>Acepto los <a href="#" class="terms-link">términos y condiciones</a> y las <a href="#" class="terms-link">políticas de privacidad</a></p>
+          </label>
+        </div>
+        
+        <div class="password-requirements">
+          <p>La contraseña debe tener:</p>
+          <ul>
+            <li id="minLength">• Al menos 6 caracteres</li>
+            <li id="hasLetter">• Una letra</li>
+            <li id="hasNumber">• Un número</li>
+          </ul>
+        </div>
+        
+        <button type="submit" class="play-btn auth-btn">CREAR CUENTA</button>
+        
+        <div class="auth-switch">
+          <p>¿Ya tienes cuenta? <a href="login.html" class="switch-link">Inicia sesión aquí</a></p>
+        </div>
+        
+        <div class="back-to-game">
+          <a href="index.html" class="menu-btn">
+            <i class="fa-solid fa-arrow-left"></i> Volver al Juego
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>
