@@ -155,6 +155,6 @@ Durante el desarrollo, puedes usar estos atajos de teclado:
 
 Este es un proyecto académico desarrollado para CI-0137 Desarrollo Web. 
 
-**Autor**: Sebastian Bolaños Serrano 
+**Autor**: Sebastian Bolaños Serrano
 **Institución**: Universidad de Costa Rica  
 **Curso**: CI-0137 Desarrollo Web
