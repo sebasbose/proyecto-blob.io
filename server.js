@@ -1,14 +1,30 @@
 // server.js - Basic Node.js server setup for future iterations
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const WebSocket = require('ws');
 const { v4: uuidv4 } = require('uuid');
+const cors = require('cors');
+const connectDB = require('./config/db');
+
+// Connect to database
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
+app.use(cors());
+app.use(express.json());
+
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/leaderboard', require('./routes/leaderboard'));
+app.use('/api/friends', require('./routes/friends'));
 
 // Basic routes
 app.get('/', (req, res) => {
