@@ -17,8 +17,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from frontend directory
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -28,7 +28,7 @@ app.use('/api/friends', require('./routes/friends'));
 
 // Basic routes
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
 
 app.get('/health', (req, res) => {
@@ -53,7 +53,7 @@ app.get('/api/stats', (req, res) => {
 // Start HTTP server
 const server = app.listen(PORT, () => {
   console.log(`🎮 Blob.io server running on port ${PORT}`);
-  console.log(`📁 Serving static files from: ${path.join(__dirname, 'public')}`);
+  console.log(`📁 Serving static files from: ${path.join(__dirname, '../frontend')}`);
   console.log(`🌐 Access the game at: http://localhost:${PORT}`);
 });
 
