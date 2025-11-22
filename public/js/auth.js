@@ -34,7 +34,7 @@ function initLoginForm() {
         }
     }
     
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const username = usernameInput.value.trim();
@@ -53,10 +53,18 @@ function initLoginForm() {
         submitBtn.classList.add('loading');
         submitBtn.disabled = true;
         
-        // Simular proceso de login (aquí irían las llamadas al servidor)
-        setTimeout(() => {
-            // Ejemplo de validación simple (en producción esto sería del servidor)
-            if (validateLogin(username, password)) {
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
                 // Guardar datos si "recordarme" está activado
                 if (rememberMe.checked) {
                     localStorage.setItem('rememberUser', 'true');
@@ -68,7 +76,8 @@ function initLoginForm() {
                 
                 // Guardar sesión del usuario
                 localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('currentUser', username);
+                localStorage.setItem('currentUser', JSON.stringify(data));
+                localStorage.setItem('token', data.token);
                 
                 showMessage('¡Inicio de sesión exitoso!', 'success');
                 
@@ -77,12 +86,18 @@ function initLoginForm() {
                     window.location.href = 'index.html';
                 }, 1500);
             } else {
-                showMessage('Usuario o contraseña incorrectos', 'error');
+                showMessage(data.message || 'Error al iniciar sesión', 'error');
                 submitBtn.textContent = originalText;
                 submitBtn.classList.remove('loading');
                 submitBtn.disabled = false;
             }
-        }, 1500);
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('Error de conexión con el servidor', 'error');
+            submitBtn.textContent = originalText;
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        }
     });
 }
 
@@ -104,7 +119,7 @@ function initRegisterForm() {
         validatePasswordMatch();
     });
     
-    registerForm.addEventListener('submit', function(e) {
+    registerForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const username = usernameInput.value.trim();
@@ -129,9 +144,18 @@ function initRegisterForm() {
         submitBtn.classList.add('loading');
         submitBtn.disabled = true;
         
-        // Simular proceso de registro
-        setTimeout(() => {
-            if (createAccount(username, email, password)) {
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
                 showMessage('¡Cuenta creada exitosamente!', 'success');
                 
                 // Redirigir al login después de un breve delay
@@ -139,12 +163,18 @@ function initRegisterForm() {
                     window.location.href = 'login.html';
                 }, 1500);
             } else {
-                showMessage('Error al crear la cuenta. El usuario ya existe.', 'error');
+                showMessage(data.message || 'Error al crear la cuenta', 'error');
                 submitBtn.textContent = originalText;
                 submitBtn.classList.remove('loading');
                 submitBtn.disabled = false;
             }
-        }, 2000);
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('Error de conexión con el servidor', 'error');
+            submitBtn.textContent = originalText;
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        }
     });
 }
 
