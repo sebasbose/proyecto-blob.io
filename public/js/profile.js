@@ -2,18 +2,92 @@
 class ProfileManager {
   constructor() {
     this.currentTab = 'overview';
-    this.userData = this.generateMockUserData();
-    this.achievements = this.generateMockAchievements();
-    this.matchHistory = this.generateMockMatchHistory();
+    this.userData = null;
+    this.achievements = this.generateMockAchievements(); // Mantener mock por ahora o implementar API
+    this.matchHistory = [];
     
     this.init();
   }
 
-  init() {
+  async init() {
+    await this.fetchUserData();
     this.setupEventListeners();
-    this.updateProfileDisplay();
-    this.setupTabNavigation();
-    this.initializeCharts();
+    if (this.userData) {
+        this.updateProfileDisplay();
+        this.setupTabNavigation();
+        this.initializeCharts();
+    }
+  }
+
+  async fetchUserData() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/users/profile', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Normalizar datos para que coincidan con la estructura esperada por el frontend
+            this.userData = {
+                ...data,
+                maxScore: data.stats?.maxScore || 0,
+                totalScore: data.stats?.totalScore || 0,
+                totalWins: data.stats?.totalWins || 0,
+                gamesPlayed: data.stats?.gamesPlayed || 0,
+                totalTime: data.stats?.totalTime || 0,
+                eliminatedPlayers: data.stats?.eliminatedPlayers || 0,
+                timesEliminated: data.stats?.timesEliminated || 0,
+                bestStreak: data.stats?.bestStreak || 0,
+                // Campos calculados o mockeados por ahora
+                globalRank: 0, // Se podría obtener del endpoint de leaderboard
+                winRate: data.stats?.gamesPlayed ? Math.round((data.stats.totalWins / data.stats.gamesPlayed) * 100) : 0,
+                averageScore: data.stats?.gamesPlayed ? Math.round(data.stats.totalScore / data.stats.gamesPlayed) : 0,
+                kdRatio: data.stats?.timesEliminated ? (data.stats.eliminatedPlayers / data.stats.timesEliminated).toFixed(2) : data.stats?.eliminatedPlayers,
+                averageLifeTime: '0m 0s', // Necesitaría más datos para calcular esto real
+                joinDate: new Date(data.createdAt).toLocaleDateString(),
+                lastActive: 'En línea ahora'
+            };
+            
+            // Cargar historial
+            this.loadHistoryFromAPI();
+            
+        } else {
+            console.error('Error fetching profile');
+            if (response.status === 401) {
+                window.location.href = 'login.html';
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+  }
+
+  async loadHistoryFromAPI() {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch('/api/users/history', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            this.matchHistory = await response.json();
+            // Formatear fechas
+            this.matchHistory = this.matchHistory.map(match => ({
+                ...match,
+                date: new Date(match.date).toLocaleDateString()
+            }));
+        }
+    } catch (error) {
+        console.error('Error loading history:', error);
+    }
   }
 
   generateMockUserData() {
