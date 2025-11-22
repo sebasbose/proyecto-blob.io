@@ -7,54 +7,38 @@ class LeaderboardsManager {
     this.playersPerPage = 10;
     this.searchQuery = '';
     
-    this.mockData = this.generateMockData();
+    this.mockData = []; // Se llenará con la API
     this.init();
   }
 
-  init() {
+  async init() {
     this.setupEventListeners();
-    this.updateLeaderboard();
+    await this.fetchLeaderboardData();
     this.updateGlobalStats();
   }
 
-  generateMockData() {
-    const names = [
-      'BlobMaster', 'ProGamer99', 'CellEater', 'SebasPlayer', 'NinjaBlob',
-      'QuantumCell', 'AlphaGamer', 'BetaDestroyer', 'GammaWin', 'DeltaForce',
-      'EpsilonPro', 'ZetaKing', 'EtaChampion', 'ThetaLord', 'IotaSlayer',
-      'KappaWarrior', 'LambdaAce', 'MuLegend', 'NuMaster', 'XiElite',
-      'OmicronGod', 'PiCalculator', 'RhoSpeed', 'SigmaGrind', 'TauTime',
-      'UpsilonWave', 'PhiGolden', 'ChiEnergy', 'PsiMind', 'OmegaEnd',
-      'BlobZilla', 'CellDivider', 'MicroMaster', 'MacroKing', 'PhotonBlob',
-      'NeutronStar', 'ElectronSpin', 'ProtonCharge', 'QuarkTop', 'BosonGod',
-      'FermionWave', 'HadronSmash', 'LeptonLight', 'BaryonHeavy', 'MesonFast',
-      'GluonBind', 'PhotonSpeed', 'GravitonPull', 'HiggsField', 'TachyonFast',
-      'QuantumTunnel', 'WaveFunction', 'Superposition', 'Entanglement', 'Decoherence'
-    ];
-
-    const players = [];
-    
-    for (let i = 0; i < 100; i++) {
-      const player = {
-        id: i + 1,
-        name: names[i % names.length] + (i > names.length - 1 ? Math.floor(i / names.length) : ''),
-        maxScore: Math.floor(Math.random() * 150000) + 5000,
-        wins: Math.floor(Math.random() * 100) + 1,
-        totalTime: Math.floor(Math.random() * 500) + 10, // horas
-        lastActive: this.getRandomDate(),
-        level: Math.floor(Math.random() * 50) + 1,
-        avatar: this.getRandomAvatar(),
-        isOnline: Math.random() > 0.7,
-        country: this.getRandomCountry()
-      };
-      
-      players.push(player);
+  async fetchLeaderboardData() {
+    try {
+        const response = await fetch(`/api/leaderboard?sortBy=${this.currentCategory === 'score' ? 'maxScore' : this.currentCategory}&limit=100`);
+        if (response.ok) {
+            const data = await response.json();
+            this.mockData = data.users.map(user => ({
+                id: user._id,
+                name: user.username,
+                maxScore: user.stats.maxScore,
+                wins: user.stats.totalWins,
+                totalTime: 0, // No disponible en lista simple
+                lastActive: new Date(user.lastActive).toLocaleDateString(),
+                level: user.level,
+                avatar: user.avatar,
+                isOnline: false, // Necesitaría websocket para esto
+                country: '🏳️' // No implementado
+            }));
+            this.updateLeaderboard();
+        }
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
     }
-
-    // Ordenar por puntuación máxima
-    players.sort((a, b) => b.maxScore - a.maxScore);
-    
-    return players;
   }
 
   getRandomAvatar() {
