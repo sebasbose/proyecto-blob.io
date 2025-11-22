@@ -2,141 +2,63 @@
 class FriendsManager {
   constructor() {
     this.currentSection = 'friends';
-    this.friendsList = this.generateMockFriends();
-    this.incomingRequests = this.generateMockIncomingRequests();
-    this.outgoingRequests = this.generateMockOutgoingRequests();
-    this.blockedUsers = this.generateMockBlockedUsers();
-    this.suggestedPlayers = this.generateMockSuggestions();
+    this.friendsList = [];
+    this.incomingRequests = [];
+    this.outgoingRequests = [];
+    this.blockedUsers = [];
+    this.suggestedPlayers = [];
     this.searchResults = [];
     
     this.init();
   }
 
-  init() {
+  async init() {
     this.setupEventListeners();
+    await this.loadAllData();
     this.loadSection(this.currentSection);
     this.updateNavigationCounts();
   }
 
-  generateMockFriends() {
-    const friends = [];
-    const names = [
-      'ProGamer99', 'BlobMaster', 'CellEater', 'NinjaBlob', 'QuantumCell',
-      'AlphaGamer', 'BetaDestroyer', 'GammaWin', 'DeltaForce', 'EpsilonPro',
-      'ZetaKing', 'EtaChampion'
-    ];
+  async loadAllData() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
-    const statuses = ['online', 'playing', 'offline'];
-    
-    for (let i = 0; i < 12; i++) {
-      const friend = {
-        id: i + 1,
-        name: names[i],
-        avatar: this.getRandomAvatar(),
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        level: Math.floor(Math.random() * 50) + 5,
-        maxScore: Math.floor(Math.random() * 100000) + 10000,
-        wins: Math.floor(Math.random() * 50) + 5,
-        lastSeen: this.getRandomLastSeen(),
-        friendSince: this.getRandomFriendDate(),
-        isPlaying: Math.random() > 0.7,
-        currentGame: Math.random() > 0.5 ? 'Blob.io Clásico' : null
-      };
-      friends.push(friend);
+    try {
+        // Cargar amigos
+        const friendsRes = await fetch('/api/friends', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (friendsRes.ok) {
+            const data = await friendsRes.json();
+            this.friendsList = data.map(f => ({
+                id: f._id,
+                name: f.username,
+                avatar: f.avatar,
+                status: 'offline', // Necesita websocket
+                level: f.level,
+                maxScore: f.maxScore,
+                wins: 0,
+                lastSeen: new Date(f.lastActive).toLocaleDateString(),
+                friendSince: new Date(f.friendSince).toLocaleDateString(),
+                isPlaying: false
+            }));
+        }
+
+        // Cargar solicitudes pendientes
+        const requestsRes = await fetch('/api/friends/requests', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (requestsRes.ok) {
+            const data = await requestsRes.json();
+            this.incomingRequests = data.map(r => ({
+                id: r._id, // ID de la solicitud (Friendship ID)
+                name: r.requester.username,
+                avatar: r.requester.avatar,
+                level: r.requester.level,
+                maxScore: 0,
+                requestDate: new Date(r.createdAt).toLocaleDateString(),
+                mutualFriends: 0
+            }));
+        }
+    } catch (error) {
+        console.error('Error loading friends data:', error);
     }
-
-    return friends;
-  }
-
-  generateMockIncomingRequests() {
-    return [
-      {
-        id: 1,
-        name: 'NewPlayer123',
-        avatar: this.getRandomAvatar(),
-        level: 12,
-        maxScore: 8547,
-        requestDate: '2024-03-20',
-        mutualFriends: 2
-      },
-      {
-        id: 2,
-        name: 'BlobHunter',
-        avatar: this.getRandomAvatar(),
-        level: 28,
-        maxScore: 45231,
-        requestDate: '2024-03-19',
-        mutualFriends: 5
-      },
-      {
-        id: 3,
-        name: 'CellMaster2024',
-        avatar: this.getRandomAvatar(),
-        level: 15,
-        maxScore: 12893,
-        requestDate: '2024-03-18',
-        mutualFriends: 1
-      }
-    ];
-  }
-
-  generateMockOutgoingRequests() {
-    return [
-      {
-        id: 1,
-        name: 'EliteGamer',
-        avatar: this.getRandomAvatar(),
-        level: 35,
-        maxScore: 87452,
-        requestDate: '2024-03-19',
-        status: 'pending'
-      },
-      {
-        id: 2,
-        name: 'TopPlayer99',
-        avatar: this.getRandomAvatar(),
-        level: 42,
-        maxScore: 125847,
-        requestDate: '2024-03-17',
-        status: 'pending'
-      }
-    ];
-  }
-
-  generateMockBlockedUsers() {
-    return [
-      {
-        id: 1,
-        name: 'ToxicPlayer',
-        avatar: 'linear-gradient(45deg, #757575, #9e9e9e)',
-        blockedDate: '2024-03-10',
-        reason: 'Comportamiento tóxico'
-      }
-    ];
-  }
-
-  generateMockSuggestions() {
-    const suggestions = [];
-    const names = [
-      'FriendlyBlob', 'SkillfulCell', 'ProBlobber', 'CellDivision', 'BlobWizard',
-      'QuantumGamer', 'MegaCell', 'UltraBlob'
-    ];
-
-    for (let i = 0; i < 8; i++) {
-      const suggestion = {
-        id: i + 1,
-        name: names[i],
-        avatar: this.getRandomAvatar(),
-        level: Math.floor(Math.random() * 40) + 10,
-        maxScore: Math.floor(Math.random() * 80000) + 15000,
-        mutualFriends: Math.floor(Math.random() * 8),
-        reason: this.getRandomSuggestionReason(),
-        isOnline: Math.random() > 0.6
-      };
-      suggestions.push(suggestion);
-    }
-
-    return suggestions;
   }
 
   getRandomAvatar() {
@@ -668,52 +590,46 @@ class FriendsManager {
   }
 
   // Acciones de amigos
-  sendFriendRequest(playerName) {
-    this.showToast(`Solicitud de amistad enviada a ${playerName}`, 'success');
-    
-    // Simular agregar a solicitudes enviadas
-    this.outgoingRequests.push({
-      id: Date.now(),
-      name: playerName,
-      avatar: this.getRandomAvatar(),
-      level: Math.floor(Math.random() * 50) + 1,
-      maxScore: Math.floor(Math.random() * 100000) + 5000,
-      requestDate: new Date().toISOString().split('T')[0],
-      status: 'pending'
-    });
+  async sendFriendRequest(playerName) {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch('/api/friends/request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ username: playerName })
+        });
 
-    // Remover de sugerencias si existe
-    this.suggestedPlayers = this.suggestedPlayers.filter(p => p.name !== playerName);
-    
-    if (this.currentSection === 'search') {
-      this.loadSuggestedPlayers();
+        if (response.ok) {
+            this.showToast(`Solicitud de amistad enviada a ${playerName}`, 'success');
+            // Actualizar UI si es necesario
+        } else {
+            const data = await response.json();
+            this.showToast(data.message || 'Error al enviar solicitud', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
     }
   }
 
-  acceptRequest(requestId) {
-    const request = this.incomingRequests.find(r => r.id === requestId);
-    if (request) {
-      // Mover a lista de amigos
-      this.friendsList.push({
-        id: Date.now(),
-        name: request.name,
-        avatar: request.avatar,
-        status: 'online',
-        level: request.level,
-        maxScore: request.maxScore,
-        wins: Math.floor(Math.random() * 50) + 5,
-        lastSeen: 'En línea ahora',
-        friendSince: new Date().toISOString().split('T')[0],
-        isPlaying: false,
-        currentGame: null
-      });
+  async acceptRequest(requestId) {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`/api/friends/accept/${requestId}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-      // Remover de solicitudes
-      this.incomingRequests = this.incomingRequests.filter(r => r.id !== requestId);
-      
-      this.showToast(`${request.name} es ahora tu amigo`, 'success');
-      this.loadRequestsSection();
-      this.updateNavigationCounts();
+        if (response.ok) {
+            this.showToast('Solicitud aceptada', 'success');
+            await this.loadAllData(); // Recargar datos
+            this.loadRequestsSection();
+            this.updateNavigationCounts();
+        }
+    } catch (error) {
+        console.error('Error:', error);
     }
   }
 
