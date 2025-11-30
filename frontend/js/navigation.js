@@ -5,16 +5,29 @@ class NavigationManager {
       home: 'index.html',
       leaderboards: 'leaderboards.html',
       profile: 'profile.html',
-      friends: 'friends.html'
+      friends: 'friends.html',
+      login: 'login.html'
     };
     
     this.init();
   }
 
   init() {
+    this.checkAuthentication();
     this.createNavigationMenu();
     this.addNavigationStyles();
     this.setupEventListeners();
+  }
+
+  checkAuthentication() {
+    // Páginas que no requieren autenticación
+    const publicPages = ['login.html', 'register.html'];
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    
+    // Si no está autenticado y no está en una página pública, redirigir al login
+    if (!API_CONFIG.isAuthenticated() && !publicPages.includes(currentPage)) {
+      window.location.href = 'login.html';
+    }
   }
 
   createNavigationMenu() {
@@ -37,6 +50,9 @@ class NavigationManager {
   }
 
   getNavigationHTML() {
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const username = user.username || 'Usuario';
+    
     return `
       <div class="nav-container">
         <div class="nav-brand">
@@ -61,6 +77,12 @@ class NavigationManager {
             <i class="fas fa-users"></i>
             <span>Amigos</span>
           </a>
+        </div>
+        <div class="nav-user">
+          <span class="user-name">${username}</span>
+          <button class="logout-btn" onclick="navigationManager.logout()">
+            <i class="fas fa-sign-out-alt"></i> Salir
+          </button>
         </div>
         <div class="nav-toggle">
           <span></span>
@@ -115,6 +137,37 @@ class NavigationManager {
         gap: 20px;
       }
 
+      .nav-user {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: white;
+      }
+
+      .user-name {
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      .logout-btn {
+        background: rgba(255, 107, 107, 0.2);
+        border: 1px solid rgba(255, 107, 107, 0.4);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .logout-btn:hover {
+        background: rgba(255, 107, 107, 0.3);
+        transform: translateY(-2px);
+      }
+
       .nav-link {
         display: flex;
         flex-direction: column;
@@ -164,6 +217,10 @@ class NavigationManager {
           padding: 0 15px;
         }
 
+        .nav-user {
+          display: none;
+        }
+
         .nav-links {
           position: absolute;
           top: 100%;
@@ -183,6 +240,15 @@ class NavigationManager {
           transform: translateY(0);
           opacity: 1;
           visibility: visible;
+        }
+
+        .nav-links.active::after {
+          content: '';
+          display: block;
+          width: 100%;
+          padding: 10px 15px;
+          margin-top: 10px;
+          border-top: 1px solid rgba(255,255,255,0.1);
         }
 
         .nav-link {
@@ -295,6 +361,12 @@ class NavigationManager {
 
   goToFriends() {
     this.navigateTo('friends');
+  }
+
+  logout() {
+    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+      API_CONFIG.logout();
+    }
   }
 }
 

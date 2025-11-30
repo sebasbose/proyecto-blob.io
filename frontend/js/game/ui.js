@@ -146,7 +146,16 @@ class UI {
   }
 
   startGame() {
-    const playerName = this.elements.playerNameInput.value.trim();
+    let playerName = this.elements.playerNameInput.value.trim();
+    
+    // Si el usuario está autenticado, usar su nombre de usuario
+    if (!playerName && API_CONFIG && API_CONFIG.isAuthenticated()) {
+      const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      playerName = user.username || '';
+      if (playerName) {
+        this.elements.playerNameInput.value = playerName;
+      }
+    }
     
     if (!playerName) {
       this.showError('Por favor, ingresa tu nombre');

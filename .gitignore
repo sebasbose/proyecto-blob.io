@@ -142,3 +142,4 @@ vite.config.ts.timestamp-*
 .vite/
 /package-lock.json
 backend/.env
+.DS_Store

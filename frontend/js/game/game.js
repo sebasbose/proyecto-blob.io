@@ -48,6 +48,11 @@ class Game {
     
     this.resizeCanvas();
     this.generateFood();
+    
+    // Conectar WebSocket si está disponible
+    if (typeof WS_CONFIG !== 'undefined') {
+      this.connectWebSocket();
+    }
     this.setupEventListeners();
     
     console.log('Game initialized');
@@ -505,7 +510,42 @@ class Game {
 
   gameOver() {
     this.stop();
-    UI.showGameOver(this.localPlayer.score, this.getPlayerRank(), this.gameTime);
+    const rank = this.getPlayerRank();
+    const totalPlayers = this.players.size;
+    
+    // Guardar resultado en el backend
+    this.saveMatchResult(rank, totalPlayers);
+    
+    UI.showGameOver(this.localPlayer.score, rank, this.gameTime);
+  }
+
+  async saveMatchResult(position, totalPlayers) {
+    if (!API_CONFIG.isAuthenticated()) {
+      console.log('Usuario no autenticado, no se guardará el resultado');
+      return;
+    }
+
+    try {
+      const duration = this.gameTime; // en segundos
+      const score = this.localPlayer.score;
+      const result = position === 1 ? 'win' : 'loss';
+      const playersEliminated = this.localPlayer.eliminatedCount || 0;
+      
+      const response = await API.post('/api/users/match', {
+        score,
+        position,
+        totalPlayers,
+        duration,
+        result,
+        playersEliminated
+      });
+
+      if (response.ok) {
+        console.log('Resultado guardado exitosamente');
+      }
+    } catch (error) {
+      console.error('Error guardando resultado:', error);
+    }
   }
 
   getPlayerRank() {
@@ -521,5 +561,38 @@ class Game {
         name: player.name,
         score: player.score
       }));
+  }
+  
+  connectWebSocket() {
+    this.ws = WS_CONFIG.connect();
+    
+    if (this.ws) {
+      this.ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          this.handleWebSocketMessage(data);
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      };
+    }
+  }
+  
+  handleWebSocketMessage(data) {
+    switch (data.type) {
+      case 'welcome':
+        console.log('Connected to game server:', data.playerId);
+        this.serverId = data.playerId;
+        break;
+      case 'gameState':
+        console.log('Received game state update');
+        break;
+      case 'playerJoined':
+        console.log('Player joined:', data.player.name);
+        break;
+      case 'playerLeft':
+        console.log('Player left:', data.playerId);
+        break;
+    }
   }
 }

@@ -7,8 +7,18 @@ const { v4: uuidv4 } = require('uuid');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-// Connect to database
-connectDB();
+// Connect to database (non-blocking)
+let dbConnected = false;
+connectDB().then(connected => {
+  dbConnected = connected;
+  if (dbConnected) {
+    console.log('📊 Base de datos lista para usar');
+  } else {
+    console.log('⚠️  Servidor corriendo sin persistencia de datos');
+  }
+}).catch(err => {
+  console.error('Error en conexión DB:', err);
+});
 
 const app = express();
 const PORT = process.env.PORT || 3000;
