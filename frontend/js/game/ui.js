@@ -276,6 +276,16 @@ class UI {
     }
   }
 
+  goToMainMenu() {
+    this.exitGame();
+    
+    // Asegurar que la navegación esté visible
+    const topNav = document.querySelector('.top-nav');
+    if (topNav) {
+      topNav.style.display = 'block';
+    }
+  }
+
   showGameOver(score, position, gameTime) {
     this.stopLeaderboardUpdates();
     

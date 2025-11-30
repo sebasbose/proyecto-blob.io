@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('Blob.io - Inicializando aplicación...');
   
   try {
+    // Verificar si el usuario está autenticado
+    checkAuthenticationStatus();
+    
     // Create game instance
     game = new Game();
     
@@ -31,6 +34,29 @@ document.addEventListener('DOMContentLoaded', () => {
     showCriticalError('Error al inicializar el juego. Por favor, recarga la página.');
   }
 });
+
+// Verificar estado de autenticación y ocultar/mostrar botones
+function checkAuthenticationStatus() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const currentUser = localStorage.getItem('currentUser');
+  
+  const loginButton = document.getElementById('loginButton');
+  const registerButton = document.getElementById('registerButton');
+  const authActions = document.querySelector('.auth-actions');
+  
+  if (isLoggedIn && currentUser) {
+    // Usuario autenticado - ocultar botones de login y registro
+    if (authActions) {
+      authActions.style.display = 'none';
+    }
+    console.log('Usuario autenticado:', currentUser);
+  } else {
+    // Usuario no autenticado - mostrar botones
+    if (authActions) {
+      authActions.style.display = 'flex';
+    }
+  }
+}
 
 // Global error handling
 function setupErrorHandling() {
