@@ -32,7 +32,7 @@ class LeaderboardsManager {
                 level: user.level,
                 avatar: user.avatar,
                 isOnline: false, // Necesitaría websocket para esto
-                country: '🏳️' // No implementado
+                country: '' // No implementado
             }));
             this.updateLeaderboard();
         }

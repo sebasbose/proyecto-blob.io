@@ -12,9 +12,9 @@ let dbConnected = false;
 connectDB().then(connected => {
   dbConnected = connected;
   if (dbConnected) {
-    console.log('📊 Base de datos lista para usar');
+    console.log(' Base de datos lista para usar');
   } else {
-    console.log('⚠️  Servidor corriendo sin persistencia de datos');
+    console.log('  Servidor corriendo sin persistencia de datos');
   }
 }).catch(err => {
   console.error('Error en conexión DB:', err);
@@ -62,9 +62,9 @@ app.get('/api/stats', (req, res) => {
 
 // Start HTTP server
 const server = app.listen(PORT, () => {
-  console.log(`🎮 Blob.io server running on port ${PORT}`);
-  console.log(`📁 Serving static files from: ${path.join(__dirname, '../frontend')}`);
-  console.log(`🌐 Access the game at: http://localhost:${PORT}`);
+  console.log(` Blob.io server running on port ${PORT}`);
+  console.log(` Serving static files from: ${path.join(__dirname, '../frontend')}`);
+  console.log(` Access the game at: http://localhost:${PORT}`);
 });
 
 // WebSocket server setup (for future multiplayer functionality)
@@ -81,7 +81,7 @@ const gameState = {
 // WebSocket connection handling
 wss.on('connection', (ws, req) => {
   const playerId = uuidv4();
-  console.log(`🔌 New WebSocket connection: ${playerId}`);
+  console.log(` New WebSocket connection: ${playerId}`);
   
   // Store connection info
   ws.playerId = playerId;
@@ -99,7 +99,7 @@ wss.on('connection', (ws, req) => {
   
   // Handle connection close
   ws.on('close', () => {
-    console.log(`❌ WebSocket connection closed: ${playerId}`);
+    console.log(` WebSocket connection closed: ${playerId}`);
     removePlayer(playerId);
   });
   
@@ -165,7 +165,7 @@ function handlePlayerJoin(ws, data) {
     player: player
   }, ws.playerId);
   
-  console.log(`👤 Player joined: ${player.name} (${ws.playerId})`);
+  console.log(` Player joined: ${player.name} (${ws.playerId})`);
 }
 
 function handlePlayerMove(ws, data) {
@@ -202,7 +202,7 @@ function handleChatMessage(ws, data) {
     // Broadcast chat message to all players
     broadcast(chatMessage);
     
-    console.log(`💬 Chat from ${player.name}: ${data.message}`);
+    console.log(` Chat from ${player.name}: ${data.message}`);
   }
 }
 
@@ -217,7 +217,7 @@ function removePlayer(playerId) {
       playerId: playerId
     });
     
-    console.log(`👋 Player left: ${player.name} (${playerId})`);
+    console.log(` Player left: ${player.name} (${playerId})`);
   }
 }
 
@@ -235,7 +235,7 @@ function broadcast(message, excludeId = null) {
 setInterval(() => {
   wss.clients.forEach((ws) => {
     if (!ws.isAlive) {
-      console.log(`💀 Terminating inactive connection: ${ws.playerId}`);
+      console.log(` Terminating inactive connection: ${ws.playerId}`);
       removePlayer(ws.playerId);
       return ws.terminate();
     }
@@ -270,17 +270,17 @@ function updateGameState() {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM received, shutting down gracefully...');
+  console.log(' SIGTERM received, shutting down gracefully...');
   server.close(() => {
-    console.log('✅ Server closed');
+    console.log(' Server closed');
     process.exit(0);
   });
 });
 
 process.on('SIGINT', () => {
-  console.log('🛑 SIGINT received, shutting down gracefully...');
+  console.log(' SIGINT received, shutting down gracefully...');
   server.close(() => {
-    console.log('✅ Server closed');
+    console.log(' Server closed');
     process.exit(0);
   });
 });
