@@ -152,6 +152,7 @@ class UI {
     if (!playerName && API_CONFIG && API_CONFIG.isAuthenticated()) {
       const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
       playerName = user.username || '';
+      console.log('Usuario autenticado, ', user);
       if (playerName) {
         this.elements.playerNameInput.value = playerName;
       }

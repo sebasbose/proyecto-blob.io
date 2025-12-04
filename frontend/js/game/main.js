@@ -21,12 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup development tools
     setupDevelopmentTools();
     
-    // Focus on name input
-    const nameInput = document.getElementById('playerName');
-    if (nameInput) {
-      nameInput.focus();
-    }
-    
     console.log('Blob.io - Aplicación inicializada correctamente');
     
   } catch (error) {
@@ -43,18 +37,62 @@ function checkAuthenticationStatus() {
   const loginButton = document.getElementById('loginButton');
   const registerButton = document.getElementById('registerButton');
   const authActions = document.querySelector('.auth-actions');
+  const userInfo = document.getElementById('userInfoDropdown');
+  const usernameDisplay = document.querySelector('.username');
   
   if (isLoggedIn && currentUser) {
     // Usuario autenticado - ocultar botones de login y registro
     if (authActions) {
       authActions.style.display = 'none';
     }
-    console.log('Usuario autenticado:', currentUser);
+    // Mostrar información del usuario en el navbar
+    if (userInfo) {
+      userInfo.style.display = 'flex';
+    }
+
+    // Mostrar nombre de usuario
+    const currentUserObj = JSON.parse(currentUser);
+
+    if (usernameDisplay) {
+      usernameDisplay.textContent = currentUserObj.username;
+    }
+    
+    console.log('Usuario autenticado:', currentUserObj);
   } else {
     // Usuario no autenticado - mostrar botones
     if (authActions) {
       authActions.style.display = 'flex';
     }
+    // Ocultar información del usuario
+    if (userInfo) {
+      userInfo.style.display = 'none';
+    }
+  }
+  
+  // Configurar botón de cerrar sesión
+  setupLogoutButton();
+}
+
+// Configurar funcionalidad del botón de cerrar sesión
+function setupLogoutButton() {
+  const logoutButton = document.getElementById('logoutButton');
+  if (logoutButton) {
+    logoutButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Confirmar cierre de sesión
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        // Limpiar datos de sesión
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('currentUser');
+        
+        // Mostrar mensaje
+        alert('Sesión cerrada exitosamente');
+        
+        // Recargar página para actualizar UI
+        window.location.reload();
+      }
+    });
   }
 }
 
@@ -349,7 +387,7 @@ let performanceMonitor = {
 // Auto-save user preferences
 function saveUserPreferences() {
   const prefs = {
-    lastPlayerName: document.getElementById('playerName')?.value || '',
+    lastPlayerName: document.querySelector('.username')?.textContent || '',
     volume: 1.0,
     graphics: 'high'
   };
@@ -364,12 +402,12 @@ function saveUserPreferences() {
 function loadUserPreferences() {
   try {
     const prefs = JSON.parse(localStorage.getItem('blobio_preferences') || '{}');
-    
-    const nameInput = document.getElementById('playerName');
-    if (nameInput && prefs.lastPlayerName) {
-      nameInput.value = prefs.lastPlayerName;
+
+    const userNameField = document.getElementById('playerName');
+    if (prefs.lastPlayerName && userNameField) {
+      userNameField.value = prefs.lastPlayerName;
     }
-    
+
     return prefs;
   } catch (e) {
     console.warn('Could not load preferences:', e);
