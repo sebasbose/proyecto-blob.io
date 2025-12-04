@@ -11,7 +11,6 @@ class UI {
   initializeElements() {
     // Main menu elements
     this.elements.mainMenu = document.getElementById('mainMenu');
-    this.elements.playerNameInput = document.getElementById('playerName');
     this.elements.playButton = document.getElementById('playButton');
     this.elements.loginButton = document.getElementById('loginButton');
     this.elements.registerButton = document.getElementById('registerButton');
@@ -46,12 +45,6 @@ class UI {
     // Main menu
     this.elements.playButton.addEventListener('click', () => {
       this.startGame();
-    });
-
-    this.elements.playerNameInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.startGame();
-      }
     });
 
     this.elements.loginButton.addEventListener('click', () => {
@@ -146,26 +139,24 @@ class UI {
   }
 
   startGame() {
-    let playerName = this.elements.playerNameInput.value.trim();
+    // Verificar autenticación
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const currentUser = localStorage.getItem('currentUser');
     
-    // Si el usuario está autenticado, usar su nombre de usuario
-    if (!playerName && API_CONFIG && API_CONFIG.isAuthenticated()) {
-      const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-      playerName = user.username || '';
-      console.log('Usuario autenticado, ', user);
-      if (playerName) {
-        this.elements.playerNameInput.value = playerName;
-      }
-    }
-    
-    if (!playerName) {
-      this.showError('Por favor, ingresa tu nombre');
-      this.elements.playerNameInput.focus();
+    if (!isLoggedIn || !currentUser) {
+      this.showError('Debes iniciar sesión para jugar');
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2000);
       return;
     }
 
-    if (playerName.length > 15) {
-      this.showError('El nombre debe tener máximo 15 caracteres');
+    // Obtener nombre del usuario autenticado
+    const user = JSON.parse(currentUser);
+    const playerName = user.username;
+    
+    if (!playerName) {
+      this.showError('Error al obtener información del usuario');
       return;
     }
 
@@ -261,10 +252,6 @@ class UI {
     this.elements.mainMenu.classList.remove('hidden');
     this.currentScreen = 'mainMenu';
     this.stopLeaderboardUpdates();
-    
-    // Clear the name input for fresh start
-    this.elements.playerNameInput.value = '';
-    this.elements.playerNameInput.focus();
 
     if (popToView === 'profile') {
       window.location.href = '/profile.html';

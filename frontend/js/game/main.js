@@ -387,7 +387,6 @@ let performanceMonitor = {
 // Auto-save user preferences
 function saveUserPreferences() {
   const prefs = {
-    lastPlayerName: document.querySelector('.username')?.textContent || '',
     volume: 1.0,
     graphics: 'high'
   };
@@ -402,12 +401,6 @@ function saveUserPreferences() {
 function loadUserPreferences() {
   try {
     const prefs = JSON.parse(localStorage.getItem('blobio_preferences') || '{}');
-
-    const userNameField = document.getElementById('playerName');
-    if (prefs.lastPlayerName && userNameField) {
-      userNameField.value = prefs.lastPlayerName;
-    }
-
     return prefs;
   } catch (e) {
     console.warn('Could not load preferences:', e);
