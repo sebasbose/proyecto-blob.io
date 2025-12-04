@@ -54,7 +54,8 @@ const UserSchema = new mongoose.Schema({
         totalTime: { type: Number, default: 0 }, // En minutos
         eliminatedPlayers: { type: Number, default: 0 },
         timesEliminated: { type: Number, default: 0 },
-        bestStreak: { type: Number, default: 0 }
+        bestStreak: { type: Number, default: 0 },
+        currentStreak: { type: Number, default: 0 }
     },
     settings: {
         colorScheme: { type: String, default: 'random' },

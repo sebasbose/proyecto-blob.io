@@ -19,25 +19,74 @@ class LeaderboardsManager {
 
   async fetchLeaderboardData() {
     try {
-        const response = await fetch(`/api/leaderboard?sortBy=${this.currentCategory === 'score' ? 'maxScore' : this.currentCategory}&limit=100`);
+        const sortByMap = {
+            'score': 'maxScore',
+            'wins': 'wins',
+            'level': 'level'
+        };
+        
+        const sortBy = sortByMap[this.currentCategory] || 'maxScore';
+        const response = await fetch(`/api/leaderboard?sortBy=${sortBy}&limit=100`);
+        
         if (response.ok) {
             const data = await response.json();
             this.mockData = data.users.map(user => ({
                 id: user._id,
                 name: user.username,
-                maxScore: user.stats.maxScore,
-                wins: user.stats.totalWins,
-                totalTime: 0, // No disponible en lista simple
+                maxScore: user.stats?.maxScore || 0,
+                wins: user.stats?.totalWins || 0,
+                totalTime: Math.floor((user.stats?.totalTime || 0) / 60), // Convertir minutos a horas
                 lastActive: new Date(user.lastActive).toLocaleDateString(),
-                level: user.level,
-                avatar: user.avatar,
-                isOnline: false, // Necesitaría websocket para esto
-                country: '' // No implementado
+                level: user.level || 1,
+                avatar: user.avatar || 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
+                isOnline: false,
+                country: '🌎'
             }));
+            
+            // Cargar estadísticas globales
+            await this.fetchGlobalStats();
+            
             this.updateLeaderboard();
+        } else {
+            console.error('Error al cargar leaderboard:', response.statusText);
+            this.generateMockData();
         }
     } catch (error) {
         console.error('Error fetching leaderboard:', error);
+        // Fallback a datos mock si falla la API
+        this.generateMockData();
+    }
+  }
+
+  async fetchGlobalStats() {
+    try {
+        const response = await fetch('/api/leaderboard/stats');
+        if (response.ok) {
+            const stats = await response.json();
+            this.globalStats = stats;
+            this.updateGlobalStats();
+        }
+    } catch (error) {
+        console.error('Error fetching global stats:', error);
+    }
+  }
+
+  generateMockData() {
+    // Datos de respaldo en caso de error
+    this.mockData = [];
+    for (let i = 0; i < 50; i++) {
+      this.mockData.push({
+        id: i + 1,
+        name: `Player${i + 1}`,
+        maxScore: Math.floor(Math.random() * 200000) + 10000,
+        wins: Math.floor(Math.random() * 100),
+        totalTime: Math.floor(Math.random() * 200) + 10,
+        lastActive: 'Hoy',
+        level: Math.floor(Math.random() * 50) + 1,
+        avatar: `linear-gradient(45deg, hsl(${Math.random() * 360}, 70%, 60%), hsl(${Math.random() * 360}, 70%, 60%))`,
+        isOnline: Math.random() > 0.7,
+        country: '🌎'
+      });
     }
   }
 
@@ -259,21 +308,31 @@ class LeaderboardsManager {
   }
 
   updateGlobalStats() {
-    // Simular estadísticas globales
-    const stats = {
-      totalPlayers: this.mockData.length * 479, // Simular más jugadores
-      totalMatches: Math.floor(Math.random() * 1000000) + 2000000,
-      totalTime: Math.floor(Math.random() * 50000) + 90000,
-      averageScore: Math.floor(this.mockData.reduce((sum, p) => sum + p.maxScore, 0) / this.mockData.length)
-    };
+    if (this.globalStats) {
+      // Usar datos reales de la API
+      const statNumbers = document.querySelectorAll('.stat-number');
+      if (statNumbers.length >= 4) {
+        statNumbers[0].textContent = this.globalStats.totalPlayers.toLocaleString();
+        statNumbers[1].textContent = this.globalStats.totalMatches.toLocaleString();
+        statNumbers[2].textContent = this.globalStats.totalTime.toLocaleString() + 'h';
+        statNumbers[3].textContent = this.globalStats.averageScore.toLocaleString();
+      }
+    } else {
+      // Fallback a estadísticas simuladas si no hay datos
+      const stats = {
+        totalPlayers: this.mockData.length,
+        totalMatches: this.mockData.length * 10,
+        totalTime: Math.floor(this.mockData.reduce((sum, p) => sum + p.totalTime, 0)),
+        averageScore: this.mockData.length > 0 ? Math.floor(this.mockData.reduce((sum, p) => sum + p.maxScore, 0) / this.mockData.length) : 0
+      };
 
-    // Actualizar las tarjetas de estadísticas
-    const statNumbers = document.querySelectorAll('.stat-number');
-    if (statNumbers.length >= 4) {
-      statNumbers[0].textContent = stats.totalPlayers.toLocaleString();
-      statNumbers[1].textContent = stats.totalMatches.toLocaleString();
-      statNumbers[2].textContent = Math.floor(stats.totalTime).toLocaleString() + 'h';
-      statNumbers[3].textContent = stats.averageScore.toLocaleString();
+      const statNumbers = document.querySelectorAll('.stat-number');
+      if (statNumbers.length >= 4) {
+        statNumbers[0].textContent = stats.totalPlayers.toLocaleString();
+        statNumbers[1].textContent = stats.totalMatches.toLocaleString();
+        statNumbers[2].textContent = stats.totalTime.toLocaleString() + 'h';
+        statNumbers[3].textContent = stats.averageScore.toLocaleString();
+      }
     }
   }
 

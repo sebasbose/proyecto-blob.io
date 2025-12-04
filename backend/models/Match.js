@@ -19,7 +19,7 @@ const MatchSchema = new mongoose.Schema({
         required: true
     },
     duration: {
-        type: String, // Formato "5m 30s" o Number (segundos)
+        type: Number, // En minutos
         required: true
     },
     result: {

@@ -87,16 +87,48 @@ router.post('/match', protect, async (req, res) => {
         user.stats.gamesPlayed += 1;
         user.stats.totalScore += score;
         if (score > user.stats.maxScore) user.stats.maxScore = score;
-        if (result === 'win') user.stats.totalWins += 1;
+        
+        // Actualizar racha y victorias
+        if (result === 'win') {
+            user.stats.totalWins += 1;
+            user.stats.currentStreak += 1;
+            if (user.stats.currentStreak > user.stats.bestStreak) {
+                user.stats.bestStreak = user.stats.currentStreak;
+            }
+        } else {
+            user.stats.currentStreak = 0;
+        }
+        
         user.stats.eliminatedPlayers += playersEliminated;
         if (result === 'loss') user.stats.timesEliminated += 1;
         
-        // Calcular tiempo total (asumiendo que duration viene como string "5m 30s" o similar, simplificado aquí)
-        // En una implementación real, duration debería enviarse en segundos
+        // Actualizar tiempo total (duration en minutos)
+        if (typeof duration === 'number') {
+            user.stats.totalTime += duration;
+        }
         
+        // Actualizar nivel basado en XP (score / 10)
+        const xpGained = Math.floor(score / 10);
+        user.currentXP += xpGained;
+        
+        while (user.currentXP >= user.maxXP) {
+            user.currentXP -= user.maxXP;
+            user.level += 1;
+            user.maxXP = Math.floor(user.maxXP * 1.5); // Incremento progresivo
+        }
+        
+        user.lastActive = Date.now();
         await user.save();
 
-        res.status(201).json(match);
+        res.status(201).json({
+            match,
+            user: {
+                level: user.level,
+                currentXP: user.currentXP,
+                maxXP: user.maxXP,
+                stats: user.stats
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
