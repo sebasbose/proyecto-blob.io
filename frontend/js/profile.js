@@ -10,9 +10,7 @@ class ProfileManager {
 
   async init() {
     // Mostrar loader
-    if (window.PageLoader) {
-      PageLoader.show('Cargando tu perfil...', 'Obteniendo tus estadísticas');
-    }
+    PageLoader.show('Cargando tu perfil...', 'Obteniendo tus estadísticas');
 
     try {
       await this.fetchUserData();
@@ -24,9 +22,7 @@ class ProfileManager {
       }
       
       // Ocultar loader
-      if (window.PageLoader) {
-        PageLoader.hide();
-      }
+      PageLoader.hide();
     } catch (error) {
       console.error('Error initializing profile:', error);
       if (window.PageLoader) {

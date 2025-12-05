@@ -6,9 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('Blob.io - Inicializando aplicación...');
   
   // Mostrar loader
-  if (window.PageLoader) {
-    PageLoader.show('Iniciando Blob.io...', 'Preparando el juego');
-  }
+  PageLoader.show('Iniciando Blob.io...', 'Preparando el juego');
   
   try {
     // Verificar si el usuario está autenticado
@@ -29,9 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Blob.io - Aplicación inicializada correctamente');
     
     // Ocultar loader
-    if (window.PageLoader) {
+    setTimeout(() => {
       PageLoader.hide();
-    }
+    }, 1000);
     
   } catch (error) {
     console.error('Error inicializando la aplicación:', error);
