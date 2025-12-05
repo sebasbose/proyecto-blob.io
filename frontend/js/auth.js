@@ -174,9 +174,7 @@ function initRegisterForm() {
             const data = await response.json();
 
             if (response.ok) {
-                if (window.PageLoader) {
-                    PageLoader.updateMessage('¡Cuenta creada!', 'Redirigiendo al login...');
-                }
+                PageLoader.updateMessage('¡Cuenta creada!', 'Redirigiendo al login...');
                 showMessage('¡Cuenta creada exitosamente!', 'success');
                 
                 // Redirigir al login después de un breve delay
@@ -184,9 +182,7 @@ function initRegisterForm() {
                     window.location.href = 'login.html';
                 }, 1500);
             } else {
-                if (window.PageLoader) {
-                    PageLoader.hide(0);
-                }
+                PageLoader.hide(0);
                 showMessage(data.message || 'Error al crear la cuenta', 'error');
                 submitBtn.textContent = originalText;
                 submitBtn.classList.remove('loading');
@@ -194,9 +190,8 @@ function initRegisterForm() {
             }
         } catch (error) {
             console.error('Error:', error);
-            if (window.PageLoader) {
-                PageLoader.hide(0);
-            }
+            PageLoader.hide(0);
+            
             showMessage('Error de conexión con el servidor', 'error');
             submitBtn.textContent = originalText;
             submitBtn.classList.remove('loading');
