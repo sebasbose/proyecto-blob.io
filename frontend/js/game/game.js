@@ -22,6 +22,11 @@ class Game {
     this.food = [];
     this.localPlayer = null;
     
+    // WebSocket connection
+    this.ws = null;
+    this.serverId = null;
+    this.serverPlayers = new Map();
+    
     // Performance
     this.lastFrameTime = 0;
     this.fps = 60;
@@ -49,10 +54,9 @@ class Game {
     this.resizeCanvas();
     this.generateFood();
     
-    // Conectar WebSocket si está disponible
-    if (typeof WS_CONFIG !== 'undefined') {
-      this.connectWebSocket();
-    }
+    // Conectar WebSocket para multijugador
+    this.connectWebSocket();
+    
     this.setupEventListeners();
     
     console.log('Game initialized');
@@ -62,10 +66,27 @@ class Game {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight - 60; // Account for HUD
     
-    // Update minimap size
+    // Update minimap size - fix to properly scale with world
     const minimapContainer = document.querySelector('.minimap-container');
-    this.minimap.width = minimapContainer.clientWidth;
-    this.minimap.height = minimapContainer.clientHeight;
+    const containerWidth = minimapContainer.clientWidth;
+    const containerHeight = minimapContainer.clientHeight;
+    
+    // Calculate proper aspect ratio based on world size
+    const worldAspect = this.worldSize.width / this.worldSize.height;
+    const containerAspect = containerWidth / containerHeight;
+    
+    if (worldAspect > containerAspect) {
+      // World is wider than container
+      this.minimap.width = containerWidth;
+      this.minimap.height = containerWidth / worldAspect;
+    } else {
+      // World is taller than container
+      this.minimap.height = containerHeight;
+      this.minimap.width = containerHeight * worldAspect;
+    }
+    
+    // Update minimap scale based on actual canvas size
+    this.settings.minimapScale = this.minimap.width / this.worldSize.width;
   }
 
   setupEventListeners() {
@@ -81,6 +102,17 @@ class Game {
         const worldY = mouseY + this.camera.y;
         
         this.localPlayer.setTarget(worldX, worldY);
+        
+        // Send movement to server
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'move',
+            x: this.localPlayer.x,
+            y: this.localPlayer.y,
+            targetX: worldX,
+            targetY: worldY
+          }));
+        }
       }
     });
 
@@ -149,8 +181,20 @@ class Game {
     this.startTime = Date.now();
     this.gameLoop();
     
-    // Add some AI players for demo
-    this.addAIPlayers();
+    // Send join message to server
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({
+        type: 'join',
+        name: playerName
+      }));
+    }
+    
+    // Add some AI players for demo (only if not enough real players)
+    setTimeout(() => {
+      if (this.players.size < 3) {
+        this.addAIPlayers();
+      }
+    }, 1000);
     
     console.log('Game started for player:', playerName);
   }
@@ -180,6 +224,13 @@ class Game {
     this.isPaused = false;
     this.players.clear();
     this.localPlayer = null;
+    
+    // Notify server
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({
+        type: 'leave'
+      }));
+    }
   }
 
   gameLoop(currentTime = 0) {
@@ -460,6 +511,13 @@ class Game {
         `Position: ${Math.floor(this.localPlayer.x)}, ${Math.floor(this.localPlayer.y)}`,
         10, this.canvas.height - 10
       );
+      
+      // Draw online players count
+      const realPlayers = Array.from(this.players.values()).filter(p => !p.isAI).length;
+      this.ctx.fillText(
+        `Jugadores: ${realPlayers} online`,
+        10, this.canvas.height - 30
+      );
     }
   }
 
@@ -472,40 +530,45 @@ class Game {
     this.minimapCtx.fillStyle = '#0a0e27';
     this.minimapCtx.fillRect(0, 0, this.minimap.width, this.minimap.height);
     
-    // Draw world border
+    // Draw world border - properly scaled to minimap size
     this.minimapCtx.strokeStyle = '#4ecdc4';
     this.minimapCtx.lineWidth = 2;
-    this.minimapCtx.strokeRect(0, 0, 
-      this.worldSize.width * scale, 
-      this.worldSize.height * scale
+    this.minimapCtx.strokeRect(
+      0, 
+      0, 
+      this.minimap.width - 1, 
+      this.minimap.height - 1
     );
     
     // Draw players
     this.players.forEach(player => {
       const x = player.x * scale;
       const y = player.y * scale;
-      const radius = Math.max(1, player.radius * scale);
+      const radius = Math.max(2, player.radius * scale * 0.5);
       
       if (player === this.localPlayer) {
         this.minimapCtx.fillStyle = '#ff6b6b';
+        // Draw a larger dot for local player
+        this.minimapCtx.beginPath();
+        this.minimapCtx.arc(x, y, radius * 1.5, 0, Math.PI * 2);
+        this.minimapCtx.fill();
       } else {
-        this.minimapCtx.fillStyle = player.color;
+        this.minimapCtx.fillStyle = player.isAI ? '#888' : '#4ecdc4';
+        this.minimapCtx.beginPath();
+        this.minimapCtx.arc(x, y, radius, 0, Math.PI * 2);
+        this.minimapCtx.fill();
       }
-      
-      this.minimapCtx.beginPath();
-      this.minimapCtx.arc(x, y, radius, 0, Math.PI * 2);
-      this.minimapCtx.fill();
     });
     
     // Draw camera view area
-    this.minimapCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    const viewX = this.camera.x * scale;
+    const viewY = this.camera.y * scale;
+    const viewWidth = this.canvas.width * scale;
+    const viewHeight = this.canvas.height * scale;
+    
+    this.minimapCtx.strokeStyle = 'rgba(255, 107, 107, 0.8)';
     this.minimapCtx.lineWidth = 1;
-    this.minimapCtx.strokeRect(
-      this.camera.x * scale,
-      this.camera.y * scale,
-      this.canvas.width * scale,
-      this.canvas.height * scale
-    );
+    this.minimapCtx.strokeRect(viewX, viewY, viewWidth, viewHeight);
   }
 
   gameOver() {
@@ -526,7 +589,7 @@ class Game {
     }
 
     try {
-      const duration = this.gameTime; // en segundos
+      const duration = Math.floor(this.gameTime / 1000);
       const score = this.localPlayer.score;
       const result = position === 1 ? 'win' : 'loss';
       const playersEliminated = this.localPlayer.eliminatedCount || 0;
@@ -564,9 +627,18 @@ class Game {
   }
   
   connectWebSocket() {
+    if (typeof WS_CONFIG === 'undefined') {
+      console.warn('WS_CONFIG not available, skipping WebSocket connection');
+      return;
+    }
+    
     this.ws = WS_CONFIG.connect();
     
     if (this.ws) {
+      this.ws.onopen = () => {
+        console.log('✓ Connected to game server');
+      };
+      
       this.ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
@@ -575,24 +647,111 @@ class Game {
           console.error('Error parsing WebSocket message:', error);
         }
       };
+      
+      this.ws.onclose = () => {
+        console.log('✗ Disconnected from game server');
+      };
+      
+      this.ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
     }
   }
   
   handleWebSocketMessage(data) {
     switch (data.type) {
       case 'welcome':
-        console.log('Connected to game server:', data.playerId);
+        console.log('Connected to game server with ID:', data.playerId);
         this.serverId = data.playerId;
         break;
+        
       case 'gameState':
-        console.log('Received game state update');
+        // Receive initial game state from server
+        if (data.players && Array.isArray(data.players)) {
+          data.players.forEach(serverPlayer => {
+            if (serverPlayer.id !== this.serverId) {
+              // Add other players to our game
+              this.syncPlayerFromServer(serverPlayer);
+            }
+          });
+        }
         break;
+        
       case 'playerJoined':
         console.log('Player joined:', data.player.name);
+        if (data.player.id !== this.serverId) {
+          this.syncPlayerFromServer(data.player);
+        }
         break;
+        
       case 'playerLeft':
         console.log('Player left:', data.playerId);
+        // Remove player from game
+        this.players.forEach((player, id) => {
+          if (id === data.playerId || player.serverId === data.playerId) {
+            this.players.delete(id);
+          }
+        });
+        break;
+        
+      case 'playerMove':
+        // Update other player positions
+        this.updatePlayerPosition(data);
+        break;
+        
+      case 'gameUpdate':
+        // Periodic game state updates
+        if (data.players) {
+          data.players.forEach(serverPlayer => {
+            if (serverPlayer.id !== this.serverId) {
+              this.syncPlayerFromServer(serverPlayer);
+            }
+          });
+        }
         break;
     }
+  }
+  
+  syncPlayerFromServer(serverPlayer) {
+    let existingPlayer = null;
+    
+    // Find player by server ID
+    this.players.forEach((player, id) => {
+      if (player.serverId === serverPlayer.id) {
+        existingPlayer = player;
+      }
+    });
+    
+    if (existingPlayer) {
+      // Update existing player
+      existingPlayer.x = serverPlayer.x;
+      existingPlayer.y = serverPlayer.y;
+      existingPlayer.radius = serverPlayer.radius;
+      existingPlayer.score = serverPlayer.score;
+    } else {
+      // Create new player from server data
+      const newPlayer = new Player(
+        serverPlayer.name,
+        serverPlayer.x,
+        serverPlayer.y,
+        serverPlayer.radius,
+        false
+      );
+      newPlayer.serverId = serverPlayer.id;
+      newPlayer.score = serverPlayer.score;
+      this.players.set(serverPlayer.id, newPlayer);
+    }
+  }
+  
+  updatePlayerPosition(data) {
+    this.players.forEach((player) => {
+      if (player.serverId === data.playerId) {
+        player.x = data.x;
+        player.y = data.y;
+        if (data.targetX !== undefined) {
+          player.setTarget(data.targetX, data.targetY);
+        }
+      }
+    });
   }
 }
