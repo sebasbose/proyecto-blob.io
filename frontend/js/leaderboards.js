@@ -19,6 +19,11 @@ class LeaderboardsManager {
       this.setupEventListeners();
       await this.fetchLeaderboardData();
       this.updateGlobalStats();
+
+      // Verificar autenticación
+      if (API_CONFIG.isAuthenticated()) {
+        await this.updateUserInfo();
+      }
       
       // Ocultar loader
       PageLoader.hide();
@@ -80,6 +85,24 @@ class LeaderboardsManager {
         }
     } catch (error) {
         console.error('Error fetching global stats:', error);
+    }
+  }
+
+  async updateUserInfo() {
+    try {
+      const response = await fetch('/api/users/profile', {
+        headers: { 'Authorization': `Bearer ${API_CONFIG.getToken()}` }
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        const usernameEl = document.querySelector('.username');
+        if (usernameEl) {
+          usernameEl.textContent = userData.username;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user info:', error);
     }
   }
 

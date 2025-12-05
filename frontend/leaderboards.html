@@ -29,10 +29,22 @@
         </ul>
       </div>
       <div class="nav-right">
-        <div class="user-info">
-          <span class="username">SebasPlayer</span>
+        <div class="user-info" id="userInfoDropdown">
           <div class="user-avatar">
             <i class="fas fa-user"></i>
+          </div>
+          <span class="username">{username}</span>
+          <i class="fas fa-chevron-down dropdown-arrow"></i>
+          <div class="user-dropdown" id="userDropdownMenu">
+            <a href="profile.html" class="dropdown-item">
+              <i class="fas fa-user-circle"></i>
+              <span>Mi Perfil</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item" id="logoutButton">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Cerrar Sesión</span>
+            </a>
           </div>
         </div>
       </div>
