@@ -1,11 +1,10 @@
-// JavaScript para la página de Perfil con datos mock
+// Profile Manager - Integrado con la base de datos real
 class ProfileManager {
   constructor() {
     this.currentTab = 'overview';
     this.userData = null;
-    this.achievements = this.generateMockAchievements(); // Mantener mock por ahora o implementar API
+    this.achievements = this.generateMockAchievements();
     this.matchHistory = [];
-    
     this.init();
   }
 
@@ -28,15 +27,11 @@ class ProfileManager {
 
     try {
         const response = await fetch('/api/users/profile', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.ok) {
             const data = await response.json();
-            
-            // Normalizar datos para que coincidan con la estructura esperada por el frontend
             this.userData = {
                 ...data,
                 maxScore: data.stats?.maxScore || 0,
@@ -47,28 +42,58 @@ class ProfileManager {
                 eliminatedPlayers: data.stats?.eliminatedPlayers || 0,
                 timesEliminated: data.stats?.timesEliminated || 0,
                 bestStreak: data.stats?.bestStreak || 0,
-                // Campos calculados o mockeados por ahora
-                globalRank: 0, // Se podría obtener del endpoint de leaderboard
+                currentStreak: data.stats?.currentStreak || 0,
+                globalRank: 0,
                 winRate: data.stats?.gamesPlayed ? Math.round((data.stats.totalWins / data.stats.gamesPlayed) * 100) : 0,
                 averageScore: data.stats?.gamesPlayed ? Math.round(data.stats.totalScore / data.stats.gamesPlayed) : 0,
-                kdRatio: data.stats?.timesEliminated ? (data.stats.eliminatedPlayers / data.stats.timesEliminated).toFixed(2) : data.stats?.eliminatedPlayers,
-                averageLifeTime: '0m 0s', // Necesitaría más datos para calcular esto real
+                kdRatio: data.stats?.timesEliminated ? (data.stats.eliminatedPlayers / data.stats.timesEliminated).toFixed(2) : data.stats?.eliminatedPlayers || 0,
+                averageLifeTime: this.formatTime(data.stats?.gamesPlayed ? Math.floor(data.stats.totalTime / data.stats.gamesPlayed) : 0),
+                totalTimeFormatted: this.formatTime(data.stats?.totalTime || 0),
                 joinDate: new Date(data.createdAt).toLocaleDateString(),
-                lastActive: 'En línea ahora'
+                lastActive: this.getTimeAgo(new Date(data.lastActive))
             };
-            
-            // Cargar historial
-            this.loadHistoryFromAPI();
-            
+            await this.loadGlobalRank();
+            await this.loadHistoryFromAPI();
         } else {
-            console.error('Error fetching profile');
-            if (response.status === 401) {
-                window.location.href = 'login.html';
-            }
+            if (response.status === 401) window.location.href = 'login.html';
         }
     } catch (error) {
         console.error('Error:', error);
     }
+  }
+
+  async loadGlobalRank() {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/leaderboard', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const leaderboard = await response.json();
+            const userRank = leaderboard.findIndex(u => u._id === this.userData._id);
+            this.userData.globalRank = userRank >= 0 ? userRank + 1 : 0;
+        }
+    } catch (error) {
+        console.error('Error loading rank:', error);
+    }
+  }
+
+  formatTime(minutes) {
+    if (!minutes) return '0m 0s';
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.floor(minutes % 60);
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m 0s`;
+  }
+
+  getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 60) return 'Hace un momento';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `Hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Hace ${hours} hora${hours > 1 ? 's' : ''}`;
+    const days = Math.floor(hours / 24);
+    return `Hace ${days} día${days > 1 ? 's' : ''}`;
   }
 
   async loadHistoryFromAPI() {
@@ -79,288 +104,93 @@ class ProfileManager {
         });
         if (response.ok) {
             this.matchHistory = await response.json();
-            // Formatear fechas
             this.matchHistory = this.matchHistory.map(match => ({
                 ...match,
-                date: new Date(match.date).toLocaleDateString()
+                date: new Date(match.date).toLocaleDateString(),
+                timeAgo: this.getTimeAgo(new Date(match.date)),
+                durationFormatted: this.formatMatchDuration(match.duration)
             }));
         }
     } catch (error) {
         console.error('Error loading history:', error);
+        this.matchHistory = [];
     }
   }
 
-  generateMockUserData() {
-    return {
-      username: 'SebasPlayer',
-      email: 'sebas@example.com',
-      bio: 'Jugador apasionado de Blob.io desde 2024',
-      level: 24,
-      currentXP: 6750,
-      maxXP: 10000,
-      maxScore: 15847,
-      globalRank: 47,
-      totalWins: 23,
-      totalScore: 347291,
-      gamesPlayed: 156,
-      totalTime: '47h 23m',
-      winRate: 14.7,
-      averageScore: 4237,
-      bestStreak: 5,
-      averageLifeTime: '3m 45s',
-      eliminatedPlayers: 89,
-      timesEliminated: 133,
-      kdRatio: 0.67,
-      avatar: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-      joinDate: '2024-01-15',
-      lastActive: 'En línea ahora',
-      settings: {
-        colorScheme: 'random',
-        showGrid: true,
-        showNames: true,
-        soundEffects: true,
-        profilePublic: true,
-        showOnline: false,
-        allowFriendRequests: true
-      }
-    };
+  formatMatchDuration(minutes) {
+    if (!minutes) return '0m 0s';
+    const mins = Math.floor(minutes);
+    const secs = Math.floor((minutes - mins) * 60);
+    return `${mins}m ${secs}s`;
   }
 
   generateMockAchievements() {
     return [
-      {
-        id: 1,
-        name: 'Rey del Blob',
-        description: 'Alcanza el primer lugar 5 veces',
-        icon: 'fas fa-crown',
-        rarity: 'gold',
-        unlocked: true,
-        unlockedDate: '2024-03-15',
-        progress: 5,
-        maxProgress: 5
-      },
-      {
-        id: 2,
-        name: 'Comedor Experto',
-        description: 'Come 1000 puntos de comida',
-        icon: 'fas fa-target',
-        rarity: 'silver',
-        unlocked: true,
-        unlockedDate: '2024-03-08',
-        progress: 1000,
-        maxProgress: 1000
-      },
-      {
-        id: 3,
-        name: 'Maratonista',
-        description: 'Juega por 30 minutos seguidos',
-        icon: 'fas fa-hourglass',
-        rarity: 'bronze',
-        unlocked: true,
-        unlockedDate: '2024-03-01',
-        progress: 30,
-        maxProgress: 30
-      },
-      {
-        id: 4,
-        name: 'Gigante',
-        description: 'Alcanza un tamaño de 100 o más',
-        icon: 'fas fa-expand-arrows-alt',
-        rarity: 'gold',
-        unlocked: true,
-        unlockedDate: '2024-02-28',
-        progress: 127,
-        maxProgress: 100
-      },
-      {
-        id: 5,
-        name: 'Velocista',
-        description: 'Elimina 3 jugadores en menos de 10 segundos',
-        icon: 'fas fa-bolt',
-        rarity: 'silver',
-        unlocked: false,
-        progress: 2,
-        maxProgress: 3
-      },
-      {
-        id: 6,
-        name: 'Superviviente',
-        description: 'Sobrevive 15 minutos en una partida',
-        icon: 'fas fa-shield-alt',
-        rarity: 'gold',
-        unlocked: false,
-        progress: 847,
-        maxProgress: 900
-      },
-      {
-        id: 7,
-        name: 'Depredador',
-        description: 'Elimina 50 jugadores',
-        icon: 'fas fa-skull',
-        rarity: 'silver',
-        unlocked: false,
-        progress: 34,
-        maxProgress: 50
-      },
-      {
-        id: 8,
-        name: 'Novato',
-        description: 'Completa tu primera partida',
-        icon: 'fas fa-baby',
-        rarity: 'bronze',
-        unlocked: true,
-        unlockedDate: '2024-01-15',
-        progress: 1,
-        maxProgress: 1
-      }
+      { id: 1, name: 'Rey del Blob', description: 'Alcanza el primer lugar 5 veces', icon: 'fas fa-crown', rarity: 'gold', unlocked: false, progress: 0, maxProgress: 5 },
+      { id: 2, name: 'Comedor Experto', description: 'Come 1000 puntos de comida', icon: 'fas fa-target', rarity: 'silver', unlocked: false, progress: 0, maxProgress: 1000 },
+      { id: 3, name: 'Novato', description: 'Completa tu primera partida', icon: 'fas fa-baby', rarity: 'bronze', unlocked: false, progress: 0, maxProgress: 1 },
+      { id: 4, name: 'Ganador', description: 'Gana 10 partidas', icon: 'fas fa-trophy', rarity: 'gold', unlocked: false, progress: 0, maxProgress: 10 }
     ];
   }
 
-  generateMockMatchHistory() {
-    const history = [];
-    const now = new Date();
-    
-    for (let i = 0; i < 50; i++) {
-      const daysAgo = Math.floor(Math.random() * 30);
-      const date = new Date(now.getTime() - (daysAgo * 24 * 60 * 60 * 1000));
-      
-      const match = {
-        id: i + 1,
-        date: date.toLocaleDateString(),
-        score: Math.floor(Math.random() * 20000) + 1000,
-        position: Math.floor(Math.random() * 20) + 1,
-        totalPlayers: Math.floor(Math.random() * 10) + 15,
-        duration: this.getRandomDuration(),
-        result: Math.random() > 0.85 ? 'win' : 'loss',
-        eliminatedBy: Math.random() > 0.5 ? 'ProGamer99' : 'BlobMaster',
-        playersEliminated: Math.floor(Math.random() * 8)
-      };
-      
-      history.push(match);
-    }
-    
-    return history.sort((a, b) => new Date(b.date) - new Date(a.date));
-  }
-
-  getRandomDuration() {
-    const minutes = Math.floor(Math.random() * 15) + 1;
-    const seconds = Math.floor(Math.random() * 60);
-    return `${minutes}m ${seconds}s`;
-  }
-
   setupEventListeners() {
-    // Tab navigation
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const tabName = e.target.dataset.tab || e.target.closest('.tab-btn').dataset.tab;
         this.switchTab(tabName);
       });
     });
-
-    // Edit profile button
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    if (editProfileBtn) {
-      editProfileBtn.addEventListener('click', () => {
-        this.switchTab('settings');
-      });
-    }
-
-    // Share profile button
-    const shareProfileBtn = document.getElementById('shareProfileBtn');
-    if (shareProfileBtn) {
-      shareProfileBtn.addEventListener('click', () => {
-        this.shareProfile();
-      });
-    }
-
-    // Edit avatar button
-    const editAvatarBtn = document.querySelector('.edit-avatar-btn');
-    if (editAvatarBtn) {
-      editAvatarBtn.addEventListener('click', () => {
-        this.openAvatarModal();
-      });
-    }
-
-    // Settings form
+    const editBtn = document.getElementById('editProfileBtn');
+    if (editBtn) editBtn.addEventListener('click', () => this.switchTab('settings'));
+    const shareBtn = document.getElementById('shareProfileBtn');
+    if (shareBtn) shareBtn.addEventListener('click', () => this.shareProfile());
+    const avatarBtn = document.querySelector('.edit-avatar-btn');
+    if (avatarBtn) avatarBtn.addEventListener('click', () => this.openAvatarModal());
     this.setupSettingsListeners();
-
-    // History filters
     this.setupHistoryFilters();
   }
 
   setupTabNavigation() {
-    // Activar el primer tab por defecto
     this.switchTab('overview');
   }
 
   switchTab(tabName) {
-    // Remover clase active de todos los tabs
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-    // Activar el tab seleccionado
     const selectedBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
     const selectedContent = document.getElementById(tabName);
-
     if (selectedBtn && selectedContent) {
       selectedBtn.classList.add('active');
       selectedContent.classList.add('active');
       this.currentTab = tabName;
-
-      // Cargar contenido específico del tab
-      switch (tabName) {
-        case 'achievements':
-          this.loadAchievements();
-          break;
-        case 'history':
-          this.loadMatchHistory();
-          break;
-        case 'statistics':
-          this.updateStatistics();
-          break;
-      }
+      if (tabName === 'achievements') this.loadAchievements();
+      else if (tabName === 'history') this.loadMatchHistory();
+      else if (tabName === 'statistics') this.updateStatistics();
     }
   }
 
   updateProfileDisplay() {
-    // Actualizar información básica del perfil
-    const usernameElements = document.querySelectorAll('.username');
-    usernameElements.forEach(el => el.textContent = this.userData.username);
-
-    // Actualizar avatar
-    const avatarElements = document.querySelectorAll('#userBlob, .avatar-blob');
-    avatarElements.forEach(el => {
-      el.style.background = this.userData.avatar;
+    document.querySelectorAll('.username, .display-username').forEach(el => el.textContent = this.userData.username);
+    document.querySelectorAll('#userBlob, .avatar-blob').forEach(el => {
+      el.style.background = this.userData.avatar || 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
     });
-
-    // Actualizar estadísticas rápidas
     const quickStats = document.querySelectorAll('.quick-stat .stat-value');
     if (quickStats.length >= 3) {
       quickStats[0].textContent = this.userData.maxScore.toLocaleString();
-      quickStats[1].textContent = `#${this.userData.globalRank}`;
+      quickStats[1].textContent = this.userData.globalRank ? `#${this.userData.globalRank}` : 'N/A';
       quickStats[2].textContent = this.userData.totalWins;
     }
-
-    // Actualizar nivel y progreso
     this.updateLevelProgress();
-
-    // Actualizar estadísticas generales
     this.updateGeneralStats();
   }
 
   updateLevelProgress() {
-    const levelElement = document.querySelector('.current-level');
+    const levelEl = document.querySelector('.current-level');
     const progressFill = document.querySelector('.level-progress .progress-fill');
     const progressText = document.querySelector('.progress-text');
-    const nextLevelText = document.querySelector('.next-level');
-
-    if (levelElement) levelElement.textContent = this.userData.level;
-    
-    if (progressFill) {
-      const percentage = (this.userData.currentXP / this.userData.maxXP) * 100;
-      progressFill.style.width = `${percentage}%`;
-    }
-
+    const nextLevel = document.querySelector('.next-level');
+    if (levelEl) levelEl.textContent = this.userData.level;
+    if (progressFill) progressFill.style.width = `${(this.userData.currentXP / this.userData.maxXP) * 100}%`;
     if (progressText) {
       const spans = progressText.querySelectorAll('span');
       if (spans.length >= 2) {
@@ -368,10 +198,9 @@ class ProfileManager {
         spans[1].textContent = `${Math.round((this.userData.currentXP / this.userData.maxXP) * 100)}%`;
       }
     }
-
-    if (nextLevelText) {
+    if (nextLevel) {
       const remaining = this.userData.maxXP - this.userData.currentXP;
-      nextLevelText.textContent = `${remaining.toLocaleString()} XP para el siguiente nivel`;
+      nextLevel.textContent = `${remaining.toLocaleString()} XP para el siguiente nivel`;
     }
   }
 
@@ -380,319 +209,180 @@ class ProfileManager {
     if (statValues.length >= 5) {
       statValues[0].textContent = this.userData.totalScore.toLocaleString();
       statValues[1].textContent = this.userData.gamesPlayed;
-      statValues[2].textContent = this.userData.totalTime;
+      statValues[2].textContent = this.userData.totalTimeFormatted;
       statValues[3].textContent = this.userData.totalWins;
       statValues[4].textContent = `${this.userData.winRate}%`;
     }
   }
 
   loadAchievements() {
-    const achievementsGrid = document.getElementById('achievementsGrid');
-    if (!achievementsGrid) return;
-
-    achievementsGrid.innerHTML = '';
-
-    this.achievements.forEach(achievement => {
-      const achievementCard = document.createElement('div');
-      achievementCard.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
-      
-      const progressPercentage = Math.round((achievement.progress / achievement.maxProgress) * 100);
-      
-      achievementCard.innerHTML = `
-        <div class="achievement-icon ${achievement.rarity}">
-          <i class="${achievement.icon}"></i>
-        </div>
-        <div class="achievement-content">
-          <h4>${achievement.name}</h4>
-          <p>${achievement.description}</p>
-          <div class="achievement-progress">
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: ${progressPercentage}%"></div>
-            </div>
-            <span>${achievement.progress}/${achievement.maxProgress}</span>
-          </div>
-          ${achievement.unlocked ? 
-            `<div class="unlock-date">Desbloqueado el ${new Date(achievement.unlockedDate).toLocaleDateString()}</div>` :
-            `<div class="unlock-date">${progressPercentage}% completado</div>`
-          }
-        </div>
-      `;
-
-      achievementCard.style.cssText = `
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        padding: 20px;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-        border: 2px solid ${achievement.unlocked ? 'rgba(76, 175, 80, 0.5)' : 'transparent'};
-        opacity: ${achievement.unlocked ? '1' : '0.7'};
-      `;
-
-      if (!achievement.unlocked) {
-        achievementCard.style.filter = 'grayscale(50%)';
-      }
-
-      achievementsGrid.appendChild(achievementCard);
+    const grid = document.getElementById('achievementsGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    this.achievements[0].progress = Math.min(this.userData.totalWins, 5);
+    this.achievements[0].unlocked = this.userData.totalWins >= 5;
+    this.achievements[2].progress = this.userData.gamesPlayed >= 1 ? 1 : 0;
+    this.achievements[2].unlocked = this.userData.gamesPlayed >= 1;
+    this.achievements[3].progress = Math.min(this.userData.totalWins, 10);
+    this.achievements[3].unlocked = this.userData.totalWins >= 10;
+    this.achievements.forEach(ach => {
+      const card = document.createElement('div');
+      card.className = `achievement-card ${ach.unlocked ? 'unlocked' : 'locked'}`;
+      const pct = Math.round((ach.progress / ach.maxProgress) * 100);
+      card.innerHTML = `<div class="achievement-icon ${ach.rarity}"><i class="${ach.icon}"></i></div><div class="achievement-content"><h4>${ach.name}</h4><p>${ach.description}</p><div class="achievement-progress"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div><span>${ach.progress}/${ach.maxProgress}</span></div><div class="unlock-date">${ach.unlocked ? '✓ Desbloqueado' : `${pct}% completado`}</div></div>`;
+      card.style.cssText = `background:rgba(255,255,255,0.1);border-radius:15px;padding:20px;backdrop-filter:blur(10px);transition:all 0.3s;border:2px solid ${ach.unlocked ? 'rgba(76,175,80,0.5)' : 'transparent'};opacity:${ach.unlocked ? '1' : '0.7'};`;
+      if (!ach.unlocked) card.style.filter = 'grayscale(50%)';
+      grid.appendChild(card);
     });
-
-    // Agregar estilos para las tarjetas de logros
-    const style = document.createElement('style');
-    style.textContent = `
-      .achievement-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      }
-      .achievement-card .achievement-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5em;
-        color: #fff;
-        margin-bottom: 15px;
-      }
-      .achievement-card .achievement-content h4 {
-        color: #fff;
-        margin-bottom: 10px;
-      }
-      .achievement-card .achievement-content p {
-        color: rgba(255, 255, 255, 0.7);
-        margin-bottom: 15px;
-        font-size: 0.9em;
-      }
-      .achievement-card .unlock-date {
-        font-size: 0.8em;
-        color: #4ecdc4;
-        margin-top: 10px;
-      }
-    `;
-    document.head.appendChild(style);
   }
 
   loadMatchHistory() {
-    const historyTableBody = document.getElementById('historyTableBody');
-    if (!historyTableBody) return;
-
-    historyTableBody.innerHTML = '';
-
+    const tbody = document.getElementById('historyTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    if (this.matchHistory.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.6);padding:20px;">No hay partidas registradas aún</td></tr>';
+      return;
+    }
     this.matchHistory.slice(0, 20).forEach(match => {
       const row = document.createElement('tr');
-      
-      const resultIcon = match.result === 'win' ? 
-        '<i class="fas fa-trophy" style="color: #4caf50;"></i>' :
-        '<i class="fas fa-skull" style="color: #f44336;"></i>';
-      
-      const resultText = match.result === 'win' ? 'Victoria' : 'Derrota';
-      const resultColor = match.result === 'win' ? '#4caf50' : '#f44336';
-
-      row.innerHTML = `
-        <td style="color: rgba(255,255,255,0.8);">${match.date}</td>
-        <td style="font-weight: bold; color: #4ecdc4;">${match.score.toLocaleString()}</td>
-        <td>
-          <span style="color: ${match.position <= 3 ? '#ffd700' : '#fff'}; font-weight: bold;">
-            #${match.position}
-          </span>
-          <span style="color: rgba(255,255,255,0.6); font-size: 0.9em;">
-            / ${match.totalPlayers}
-          </span>
-        </td>
-        <td style="color: rgba(255,255,255,0.8);">${match.duration}</td>
-        <td style="color: rgba(255,255,255,0.6);">${match.totalPlayers}</td>
-        <td>
-          <div style="display: flex; align-items: center; gap: 8px; color: ${resultColor};">
-            ${resultIcon}
-            <span style="font-weight: bold;">${resultText}</span>
-          </div>
-        </td>
-      `;
-
-      // Resaltar victorias y top 3
-      if (match.result === 'win' || match.position <= 3) {
-        row.style.background = `linear-gradient(45deg, ${resultColor}20, ${resultColor}10)`;
-      }
-
-      historyTableBody.appendChild(row);
+      const icon = match.result === 'win' ? '<i class="fas fa-trophy" style="color:#4caf50;"></i>' : '<i class="fas fa-skull" style="color:#f44336;"></i>';
+      const color = match.result === 'win' ? '#4caf50' : '#f44336';
+      row.innerHTML = `<td style="color:rgba(255,255,255,0.8);">${match.date}</td><td style="font-weight:bold;color:#4ecdc4;">${match.score.toLocaleString()}</td><td><span style="color:${match.position <= 3 ? '#ffd700' : '#fff'};font-weight:bold;">#${match.position}</span><span style="color:rgba(255,255,255,0.6);font-size:0.9em;"> / ${match.totalPlayers}</span></td><td style="color:rgba(255,255,255,0.8);">${match.durationFormatted}</td><td style="color:rgba(255,255,255,0.6);">${match.totalPlayers}</td><td><div style="display:flex;align-items:center;gap:8px;color:${color};">${icon}<span style="font-weight:bold;">${match.result === 'win' ? 'Victoria' : 'Derrota'}</span></div></td>`;
+      if (match.result === 'win' || match.position <= 3) row.style.background = `linear-gradient(45deg,${color}20,${color}10)`;
+      tbody.appendChild(row);
     });
   }
 
   setupHistoryFilters() {
-    const historyFilter = document.getElementById('historyFilter');
-    const dateFilter = document.getElementById('dateFilter');
-
-    if (historyFilter) {
-      historyFilter.addEventListener('change', () => {
-        this.filterMatchHistory();
-      });
-    }
-
-    if (dateFilter) {
-      dateFilter.addEventListener('change', () => {
-        this.filterMatchHistory();
-      });
-    }
-  }
-
-  filterMatchHistory() {
-    // En una aplicación real, esto filtraría los datos del servidor
-    this.loadMatchHistory();
+    const filter = document.getElementById('historyFilter');
+    const date = document.getElementById('dateFilter');
+    if (filter) filter.addEventListener('change', () => this.loadMatchHistory());
+    if (date) date.addEventListener('change', () => this.loadMatchHistory());
   }
 
   updateStatistics() {
-    // Actualizar estadísticas detalladas
-    const statRows = document.querySelectorAll('.stat-category .stat-row');
-    
-    if (statRows.length >= 6) {
-      // Rendimiento
-      statRows[0].children[1].textContent = this.userData.averageScore.toLocaleString();
-      statRows[1].children[1].textContent = `${this.userData.bestStreak} victorias`;
-      statRows[2].children[1].textContent = this.userData.averageLifeTime;
-      
-      // Combate
-      statRows[3].children[1].textContent = this.userData.eliminatedPlayers;
-      statRows[4].children[1].textContent = this.userData.timesEliminated;
-      statRows[5].children[1].textContent = this.userData.kdRatio;
+    const rows = document.querySelectorAll('.stat-category .stat-row');
+    if (rows.length >= 6) {
+      rows[0].children[1].textContent = this.userData.averageScore.toLocaleString();
+      rows[1].children[1].textContent = `${this.userData.bestStreak} victorias`;
+      rows[2].children[1].textContent = this.userData.averageLifeTime;
+      rows[3].children[1].textContent = this.userData.eliminatedPlayers;
+      rows[4].children[1].textContent = this.userData.timesEliminated;
+      rows[5].children[1].textContent = this.userData.kdRatio;
     }
   }
 
   initializeCharts() {
-    // Simular gráfico de progreso (en una app real usarías Chart.js o similar)
     const canvas = document.getElementById('scoreChart');
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      this.drawScoreChart(ctx, canvas.width, canvas.height);
-    }
+    if (canvas) this.drawScoreChart(canvas.getContext('2d'), canvas.width, canvas.height);
   }
 
-  drawScoreChart(ctx, width, height) {
-    // Datos simulados para el gráfico
-    const data = [];
-    for (let i = 0; i < 30; i++) {
-      data.push(Math.floor(Math.random() * 5000) + 2000);
+  drawScoreChart(ctx, w, h) {
+    const data = this.matchHistory.slice(0, 30).reverse().map(m => m.score);
+    if (data.length === 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = '16px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('No hay datos suficientes', w / 2, h / 2);
+      return;
     }
-
-    // Limpiar canvas
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.fillRect(0, 0, width, height);
-
-    // Configurar estilo
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.fillRect(0, 0, w, h);
     ctx.strokeStyle = '#4ecdc4';
     ctx.lineWidth = 3;
-    ctx.fillStyle = 'rgba(78, 205, 196, 0.2)';
-
-    // Dibujar línea
     ctx.beginPath();
-    const stepX = width / (data.length - 1);
+    const stepX = w / (data.length - 1);
     const maxY = Math.max(...data);
     const minY = Math.min(...data);
-    const rangeY = maxY - minY;
-
-    data.forEach((value, index) => {
-      const x = index * stepX;
-      const y = height - ((value - minY) / rangeY) * height;
-      
-      if (index === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
+    const rangeY = maxY - minY || 1;
+    data.forEach((val, i) => {
+      const x = i * stepX;
+      const y = h - ((val - minY) / rangeY) * h;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     });
-
     ctx.stroke();
-
-    // Rellenar área bajo la curva
-    ctx.lineTo(width, height);
-    ctx.lineTo(0, height);
+    ctx.fillStyle = 'rgba(78,205,196,0.2)';
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
     ctx.closePath();
     ctx.fill();
   }
 
   setupSettingsListeners() {
-    // Save settings button
-    const saveBtn = document.getElementById('saveSettings');
-    if (saveBtn) {
-      saveBtn.addEventListener('click', () => {
-        this.saveSettings();
-      });
-    }
-
-    // Reset settings button
-    const resetBtn = document.getElementById('resetSettings');
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        this.resetSettings();
-      });
-    }
-
-    // Load current settings
+    const save = document.getElementById('saveSettings');
+    const reset = document.getElementById('resetSettings');
+    if (save) save.addEventListener('click', () => this.saveSettings());
+    if (reset) reset.addEventListener('click', () => this.resetSettings());
     this.loadCurrentSettings();
   }
 
   loadCurrentSettings() {
-    // Cargar configuración actual en el formulario
-    const usernameInput = document.getElementById('usernameInput');
-    const emailInput = document.getElementById('emailInput');
-    const bioInput = document.getElementById('bioInput');
-
-    if (usernameInput) usernameInput.value = this.userData.username;
-    if (emailInput) emailInput.value = this.userData.email;
-    if (bioInput) bioInput.value = this.userData.bio;
-
-    // Configuración de juego
-    Object.keys(this.userData.settings).forEach(key => {
-      const element = document.getElementById(key);
-      if (element) {
-        if (element.type === 'checkbox') {
-          element.checked = this.userData.settings[key];
-        } else {
-          element.value = this.userData.settings[key];
-        }
-      }
-    });
+    const user = document.getElementById('usernameInput');
+    const email = document.getElementById('emailInput');
+    const bio = document.getElementById('bioInput');
+    if (user) user.value = this.userData.username;
+    if (email) email.value = this.userData.email;
+    if (bio) bio.value = this.userData.bio;
+    if (this.userData.settings) {
+      Object.keys(this.userData.settings).forEach(key => {
+        const el = document.getElementById(key);
+        if (el) el.type === 'checkbox' ? (el.checked = this.userData.settings[key]) : (el.value = this.userData.settings[key]);
+      });
+    }
   }
 
-  saveSettings() {
-    // Obtener valores del formulario
-    const usernameInput = document.getElementById('usernameInput');
-    const emailInput = document.getElementById('emailInput');
-    const bioInput = document.getElementById('bioInput');
-
-    if (usernameInput) this.userData.username = usernameInput.value;
-    if (emailInput) this.userData.email = emailInput.value;
-    if (bioInput) this.userData.bio = bioInput.value;
-
-    // Guardar configuración de juego
-    Object.keys(this.userData.settings).forEach(key => {
-      const element = document.getElementById(key);
-      if (element) {
-        if (element.type === 'checkbox') {
-          this.userData.settings[key] = element.checked;
-        } else {
-          this.userData.settings[key] = element.value;
+  async saveSettings() {
+    const user = document.getElementById('usernameInput');
+    const email = document.getElementById('emailInput');
+    const bio = document.getElementById('bioInput');
+    const data = {};
+    if (user && user.value !== this.userData.username) data.username = user.value;
+    if (email && email.value !== this.userData.email) data.email = email.value;
+    if (bio && bio.value !== this.userData.bio) data.bio = bio.value;
+    const settings = {};
+    let changed = false;
+    if (this.userData.settings) {
+      Object.keys(this.userData.settings).forEach(key => {
+        const el = document.getElementById(key);
+        if (el) {
+          const val = el.type === 'checkbox' ? el.checked : el.value;
+          if (val !== this.userData.settings[key]) {
+            settings[key] = val;
+            changed = true;
+          }
         }
+      });
+    }
+    if (changed) data.settings = { ...this.userData.settings, ...settings };
+    if (Object.keys(data).length > 0) {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/users/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          this.userData = { ...this.userData, ...updated };
+          this.updateProfileDisplay();
+          this.showToast('Configuración guardada exitosamente', 'success');
+        } else {
+          const err = await res.json();
+          this.showToast(err.message || 'Error al guardar', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving:', error);
+        this.showToast('Error de conexión', 'error');
       }
-    });
-
-    // Actualizar display
-    this.updateProfileDisplay();
-
-    // Mostrar confirmación
-    this.showToast('Configuración guardada exitosamente', 'success');
+    } else {
+      this.showToast('No hay cambios para guardar', 'info');
+    }
   }
 
   resetSettings() {
-    if (confirm('¿Estás seguro de que quieres restablecer toda la configuración?')) {
-      this.userData.settings = {
-        colorScheme: 'random',
-        showGrid: true,
-        showNames: true,
-        soundEffects: true,
-        profilePublic: true,
-        showOnline: false,
-        allowFriendRequests: true
-      };
-      
+    if (confirm('¿Estás seguro de restablecer toda la configuración?')) {
       this.loadCurrentSettings();
       this.showToast('Configuración restablecida', 'info');
     }
@@ -707,61 +397,50 @@ class ProfileManager {
   }
 
   setupAvatarCustomizer() {
-    const colorOptions = document.querySelectorAll('.color-option');
-    const previewBlob = document.getElementById('previewBlob');
-    const saveAvatarBtn = document.getElementById('saveAvatar');
-    const cancelAvatarBtn = document.getElementById('cancelAvatar');
+    const colors = document.querySelectorAll('.color-option');
+    const preview = document.getElementById('previewBlob');
+    const save = document.getElementById('saveAvatar');
+    const cancel = document.getElementById('cancelAvatar');
     const modal = document.getElementById('avatarModal');
-
-    let selectedColor = this.userData.avatar;
-
-    // Preview inicial
-    if (previewBlob) {
-      previewBlob.style.background = selectedColor;
-    }
-
-    // Color selection
-    colorOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        colorOptions.forEach(opt => opt.classList.remove('active'));
-        option.classList.add('active');
-        
-        const color = option.dataset.color;
-        selectedColor = this.getColorGradient(color);
-        
-        if (previewBlob) {
-          previewBlob.style.background = selectedColor;
+    let selected = this.userData.avatar;
+    if (preview) preview.style.background = selected;
+    colors.forEach(opt => {
+      opt.addEventListener('click', () => {
+        colors.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        selected = this.getColorGradient(opt.dataset.color);
+        if (preview) preview.style.background = selected;
+      });
+    });
+    if (save) {
+      save.addEventListener('click', async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const res = await fetch('/api/users/profile', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ avatar: selected })
+          });
+          if (res.ok) {
+            this.userData.avatar = selected;
+            this.updateProfileDisplay();
+            modal.style.display = 'none';
+            this.showToast('Avatar actualizado', 'success');
+          } else {
+            this.showToast('Error al actualizar avatar', 'error');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          this.showToast('Error de conexión', 'error');
         }
       });
-    });
-
-    // Save avatar
-    if (saveAvatarBtn) {
-      saveAvatarBtn.addEventListener('click', () => {
-        this.userData.avatar = selectedColor;
-        this.updateProfileDisplay();
-        modal.style.display = 'none';
-        this.showToast('Avatar actualizado', 'success');
-      });
     }
-
-    // Cancel
-    if (cancelAvatarBtn) {
-      cancelAvatarBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-      });
-    }
-
-    // Close modal
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
+    if (cancel) cancel.addEventListener('click', () => modal.style.display = 'none');
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
   }
 
   getColorGradient(color) {
-    const gradients = {
+    const grads = {
       red: 'linear-gradient(45deg, #ff6b6b, #ff5722)',
       blue: 'linear-gradient(45deg, #4ecdc4, #45b7d1)',
       green: 'linear-gradient(45deg, #96ceb4, #66bb6a)',
@@ -769,91 +448,32 @@ class ProfileManager {
       orange: 'linear-gradient(45deg, #ffa726, #ff7043)',
       pink: 'linear-gradient(45deg, #ec407a, #e91e63)'
     };
-    return gradients[color] || gradients.red;
+    return grads[color] || grads.red;
   }
 
   shareProfile() {
-    // Simular compartir perfil
-    const profileURL = `${window.location.origin}/profile.html?user=${this.userData.username}`;
-    
+    const url = `${window.location.origin}/profile.html?user=${this.userData.username}`;
     if (navigator.share) {
-      navigator.share({
-        title: `Perfil de ${this.userData.username} - Blob.io`,
-        text: `¡Mira mi perfil en Blob.io! Nivel ${this.userData.level} con ${this.userData.totalWins} victorias.`,
-        url: profileURL
-      });
+      navigator.share({ title: `Perfil de ${this.userData.username} - Blob.io`, text: `¡Mira mi perfil! Nivel ${this.userData.level} con ${this.userData.totalWins} victorias.`, url });
     } else {
-      // Fallback: copiar al portapapeles
-      navigator.clipboard.writeText(profileURL).then(() => {
-        this.showToast('Enlace del perfil copiado al portapapeles', 'success');
-      });
+      navigator.clipboard.writeText(url).then(() => this.showToast('Enlace copiado', 'success'));
     }
   }
 
-  showToast(message, type = 'info') {
+  showToast(msg, type = 'info') {
     const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    
-    toast.style.cssText = `
-      position: fixed;
-      top: 100px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.9);
-      color: #fff;
-      padding: 15px 20px;
-      border-radius: 10px;
-      backdrop-filter: blur(10px);
-      z-index: 3000;
-      animation: slideIn 0.3s ease;
-    `;
-
-    if (type === 'success') {
-      toast.style.borderLeft = '4px solid #4caf50';
-    } else if (type === 'error') {
-      toast.style.borderLeft = '4px solid #f44336';
-    } else {
-      toast.style.borderLeft = '4px solid #4ecdc4';
-    }
-
+    toast.textContent = msg;
+    toast.style.cssText = `position:fixed;top:100px;right:20px;background:rgba(0,0,0,0.9);color:#fff;padding:15px 20px;border-radius:10px;z-index:3000;animation:slideIn 0.3s;border-left:4px solid ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#4ecdc4'}`;
     document.body.appendChild(toast);
-
     setTimeout(() => {
-      toast.style.animation = 'slideOut 0.3s ease';
-      setTimeout(() => {
-        document.body.removeChild(toast);
-      }, 300);
+      toast.style.animation = 'slideOut 0.3s';
+      setTimeout(() => document.body.removeChild(toast), 300);
     }, 3000);
   }
 }
 
-// Inicializar cuando se carga la página
-document.addEventListener('DOMContentLoaded', () => {
-  const profileManager = new ProfileManager();
-  
-  // Animaciones de entrada
-  setTimeout(() => {
-    document.querySelectorAll('.stats-card, .level-card, .recent-achievements, .recent-matches').forEach((card, index) => {
-      setTimeout(() => {
-        card.style.animation = 'fadeIn 0.6s ease-out';
-      }, index * 100);
-    });
-  }, 500);
-});
+document.addEventListener('DOMContentLoaded', () => new ProfileManager());
 
-// Agregar estilos para animaciones
-const animationStyles = document.createElement('style');
-animationStyles.textContent = `
-  @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-  @keyframes slideOut {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
-  }
-`;
-document.head.appendChild(animationStyles);
-
-// Exportar para debugging
-window.ProfileManager = ProfileManager;
+const style = document.createElement('style');
+style.textContent = `@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}.achievement-card:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(0,0,0,0.3)}.achievement-card .achievement-icon{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5em;color:#fff;margin-bottom:15px}.achievement-card .achievement-icon.gold{background:linear-gradient(45deg,#ffd700,#ffed4e)}.achievement-card .achievement-icon.silver{background:linear-gradient(45deg,#c0c0c0,#e8e8e8)}.achievement-card .achievement-icon.bronze{background:linear-gradient(45deg,#cd7f32,#d4a574)}.achievement-card .achievement-content h4{color:#fff;margin-bottom:10px}.achievement-card .achievement-content p{color:rgba(255,255,255,0.7);margin-bottom:15px;font-size:0.9em}.achievement-card .unlock-date{font-size:0.8em;color:#4ecdc4;margin-top:10px}.achievement-progress{margin-top:10px}.achievement-progress .progress-bar{background:rgba(255,255,255,0.1);border-radius:10px;height:8px;overflow:hidden;margin-bottom:5px}.achievement-progress .progress-fill{background:linear-gradient(90deg,#4ecdc4,#45b7d1);height:100%;transition:width 0.3s}#achievementsGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;margin-top:20px}`;
+document.head.appendChild(style);
