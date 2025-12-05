@@ -110,9 +110,163 @@ router.get('/requests', protect, async (req, res) => {
         const requests = await Friendship.find({
             recipient: req.user._id,
             status: 'pending'
-        }).populate('requester', 'username avatar level');
+        }).populate('requester', 'username avatar level stats.maxScore');
 
         res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Rechazar solicitud de amistad
+// @route   DELETE /api/friends/reject/:id
+// @access  Private
+router.delete('/reject/:id', protect, async (req, res) => {
+    try {
+        const friendship = await Friendship.findById(req.params.id);
+
+        if (!friendship) {
+            return res.status(404).json({ message: 'Solicitud no encontrada' });
+        }
+
+        if (friendship.recipient.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ message: 'No autorizado' });
+        }
+
+        await Friendship.findByIdAndDelete(req.params.id);
+
+        res.json({ message: 'Solicitud rechazada' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Eliminar amigo
+// @route   DELETE /api/friends/:id
+// @access  Private
+router.delete('/:id', protect, async (req, res) => {
+    try {
+        const friendship = await Friendship.findOne({
+            $or: [
+                { requester: req.user._id, recipient: req.params.id },
+                { requester: req.params.id, recipient: req.user._id }
+            ],
+            status: 'accepted'
+        });
+
+        if (!friendship) {
+            return res.status(404).json({ message: 'Amistad no encontrada' });
+        }
+
+        await Friendship.findByIdAndDelete(friendship._id);
+
+        res.json({ message: 'Amigo eliminado' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Buscar usuarios
+// @route   GET /api/friends/search?q=query
+// @access  Private
+router.get('/search', protect, async (req, res) => {
+    try {
+        const query = req.query.q;
+        
+        if (!query || query.length < 2) {
+            return res.status(400).json({ message: 'La búsqueda debe tener al menos 2 caracteres' });
+        }
+
+        // Buscar usuarios que coincidan con el query
+        const users = await User.find({
+            username: { $regex: query, $options: 'i' },
+            _id: { $ne: req.user._id } // Excluir al usuario actual
+        })
+        .select('username avatar level stats.maxScore')
+        .limit(20);
+
+        // Obtener amistades existentes para marcar estado
+        const friendships = await Friendship.find({
+            $or: [
+                { requester: req.user._id },
+                { recipient: req.user._id }
+            ]
+        });
+
+        // Crear un mapa de estados de amistad
+        const friendshipMap = new Map();
+        friendships.forEach(f => {
+            const otherId = f.requester.toString() === req.user._id.toString() 
+                ? f.recipient.toString() 
+                : f.requester.toString();
+            friendshipMap.set(otherId, {
+                status: f.status,
+                isRequester: f.requester.toString() === req.user._id.toString()
+            });
+        });
+
+        // Agregar información de estado a cada usuario
+        const usersWithStatus = users.map(user => {
+            const userObj = user.toObject();
+            const friendship = friendshipMap.get(user._id.toString());
+            
+            if (friendship) {
+                if (friendship.status === 'accepted') {
+                    userObj.friendshipStatus = 'friends';
+                } else if (friendship.status === 'pending') {
+                    userObj.friendshipStatus = friendship.isRequester ? 'requested' : 'pending';
+                }
+            } else {
+                userObj.friendshipStatus = 'none';
+            }
+            
+            return userObj;
+        });
+
+        res.json(usersWithStatus);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Obtener solicitudes enviadas
+// @route   GET /api/friends/requests/sent
+// @access  Private
+router.get('/requests/sent', protect, async (req, res) => {
+    try {
+        const requests = await Friendship.find({
+            requester: req.user._id,
+            status: 'pending'
+        }).populate('recipient', 'username avatar level stats.maxScore');
+
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Cancelar solicitud enviada
+// @route   DELETE /api/friends/requests/cancel/:id
+// @access  Private
+router.delete('/requests/cancel/:id', protect, async (req, res) => {
+    try {
+        const friendship = await Friendship.findById(req.params.id);
+
+        if (!friendship) {
+            return res.status(404).json({ message: 'Solicitud no encontrada' });
+        }
+
+        if (friendship.requester.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ message: 'No autorizado' });
+        }
+
+        if (friendship.status !== 'pending') {
+            return res.status(400).json({ message: 'Solo puedes cancelar solicitudes pendientes' });
+        }
+
+        await Friendship.findByIdAndDelete(req.params.id);
+
+        res.json({ message: 'Solicitud cancelada' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

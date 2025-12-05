@@ -66,32 +66,13 @@
       <button class="nav-btn" data-section="blocked">
         <i class="fas fa-user-slash"></i>
         <span>Bloqueados</span>
-        <span class="count-badge">1</span>
       </button>
     </div>
 
     <!-- Sección: Mis Amigos -->
     <div class="friends-section active" id="friends-section">
       <div class="section-header">
-        <h2>Mis Amigos (12)</h2>
-        <div class="friends-actions">
-          <div class="filter-dropdown">
-            <button class="filter-btn">
-              <i class="fas fa-filter"></i>
-              Filtrar
-            </button>
-            <div class="dropdown-content">
-              <a href="#" data-filter="all">Todos</a>
-              <a href="#" data-filter="online">En línea</a>
-              <a href="#" data-filter="playing">Jugando</a>
-              <a href="#" data-filter="offline">Desconectado</a>
-            </div>
-          </div>
-          <button class="action-btn secondary" id="inviteAllBtn">
-            <i class="fas fa-paper-plane"></i>
-            Invitar a todos
-          </button>
-        </div>
+        <h2>Mis Amigos (0)</h2>
       </div>
 
       <div class="friends-grid" id="friendsList">
@@ -112,24 +93,10 @@
             <i class="fas fa-search"></i>
           </button>
         </div>
-        <div class="search-filters">
-          <button class="filter-tag active" data-search-filter="all">Todos</button>
-          <button class="filter-tag" data-search-filter="online">En línea</button>
-          <button class="filter-tag" data-search-filter="level">Por nivel</button>
-          <button class="filter-tag" data-search-filter="recent">Jugadores recientes</button>
-        </div>
       </div>
 
       <div class="search-results" id="searchResults">
         <!-- Se llenará dinámicamente -->
-      </div>
-
-      <!-- Sugerencias -->
-      <div class="suggestions-section">
-        <h3><i class="fas fa-lightbulb"></i> Jugadores Sugeridos</h3>
-        <div class="suggestions-grid" id="suggestedPlayers">
-          <!-- Se llenará dinámicamente -->
-        </div>
       </div>
     </div>
 
@@ -169,8 +136,8 @@
     <!-- Sección: Jugadores Bloqueados -->
     <div class="friends-section" id="blocked-section">
       <div class="section-header">
-        <h2>Jugadores Bloqueados (1)</h2>
-        <p class="section-description">Los jugadores bloqueados no pueden enviarte mensajes ni solicitudes de amistad.</p>
+        <h2>Jugadores Bloqueados</h2>
+        <p class="section-description">Funcionalidad próximamente disponible.</p>
       </div>
 
       <div class="blocked-list" id="blockedList">
@@ -185,8 +152,6 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/navigation.js"></script>
-  <script src="js/friends.js"></script>
   <script src="js/config.js"></script>
   <script src="js/navigation.js"></script>
   <script src="js/friends.js"></script>
