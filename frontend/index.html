@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blob.io - Juego Multijugador</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/loader.css">
+  <script src="https://kit.fontawesome.com/62f4d88379.js" crossorigin="anonymous"></script>
+  <script src="js/auth-check.js"></script>
+  <script src="js/loader.js"></script>
+</head>
+<body>
+  <!-- Menu Principal -->
+  <div id="mainMenu" class="menu-container">
+    <!-- Navegación Superior -->
+    <nav class="top-nav">
+      <div class="nav-content">
+        <div class="nav-left">
+          <a href="index.html" class="logo">
+            <h2 class="game-title-small">BLOB.IO</h2>
+          </a>
+        </div>
+        <div class="nav-center">
+          <ul class="nav-links">
+            <li><a href="index.html" class="active"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="leaderboards.html"><i class="fas fa-trophy"></i> Rankings</a></li>
+            <li><a href="profile.html"><i class="fas fa-user"></i> Perfil</a></li>
+            <li><a href="friends.html"><i class="fas fa-users"></i> Amigos</a></li>
+          </ul>
+        </div>
+        <div class="nav-right">
+          <div class="user-info" id="userInfoDropdown">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <span class="username">{username}</span>
+            <i class="fas fa-chevron-down dropdown-arrow"></i>
+            <div class="user-dropdown" id="userDropdownMenu">
+              <a href="profile.html" class="dropdown-item">
+                <i class="fas fa-user-circle"></i>
+                <span>Mi Perfil</span>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="#" class="dropdown-item" id="logoutButton">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Contenedor del Menú -->
+    <div class="menu-content">
+      <h1 class="game-title">BLOB.IO</h1>
+      <div class="menu-form">
+        <button id="playButton" class="play-btn">JUGAR</button>
+      </div>
+      <div class="game-info">
+        <h3>Cómo jugar:</h3>
+        <ul>
+          <li>Mueve tu blob con el mouse</li>
+          <li>Come puntos pequeños para crecer</li>
+          <li>Evita blobs más grandes</li>
+          <li>¡Intenta llegar al primer lugar!</li>
+        </ul>
+      </div>
+      <div class="auth-actions">
+        <button id="loginButton" class="auth-btn">Iniciar Sesión</button>
+        <button id="registerButton" class="auth-btn">Registrarse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interfaz del Juego -->
+  <div id="gameContainer" class="game-container hidden">
+    <!-- HUD Superior -->
+    <div class="game-hud">
+      <div class="hud-left">
+        <div class="score-display">
+          <span class="score-label">Puntuación:</span>
+          <span id="playerScore">0</span>
+        </div>
+        <div class="player-info">
+          <span class="player-label">Jugador:</span>
+          <span id="playerNameDisplay"></span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <button id="pauseButton" class="control-btn"><i class="fa-solid fa-pause"></i></button>
+        <button id="profileButton" class="control-btn"><i class="fa-solid fa-user"></i></button>
+        <button id="exitButton" class="control-btn"><i class="fa-solid fa-house"></i></button>
+      </div>
+    </div>
+
+    <!-- Canvas del Juego -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Minimap -->
+    <div class="minimap-container">
+      <canvas id="minimap"></canvas>
+    </div>
+
+    <!-- Tabla de Posiciones -->
+    <div class="leaderboard">
+      <h3>Clasificación</h3>
+      <ol id="leaderboardList">
+        <!-- Se llenará dinámicamente -->
+      </ol>
+    </div>
+  </div>
+
+  <!-- Menu de Pausa -->
+  <div id="pauseMenu" class="overlay-menu hidden">
+    <div class="menu-content">
+      <h2>Juego Pausado</h2>
+      <button id="resumeButton" class="menu-btn">Continuar</button>
+      <button id="restartButton" class="menu-btn">Reiniciar</button>
+      <button id="homeButton" class="menu-btn">Menú Principal</button>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameOverMenu" class="overlay-menu hidden">
+    <div class="menu-content">
+      <h2>¡Juego Terminado!</h2>
+      <div class="final-stats">
+        <p>Puntuación Final: <span id="finalScore">0</span></p>
+        <p>Posición: <span id="finalPosition">-</span></p>
+        <p>Tiempo jugado: <span id="gameTime">0:00</span></p>
+      </div>
+      <button id="playAgainButton" class="menu-btn">Jugar de Nuevo</button>
+      <button id="backToMenuButton" class="menu-btn">Menú Principal</button>
+    </div>
+  </div>
+
+  <!-- JavaScript (load config first) -->
+  <script src="js/config.js"></script>
+  <script src="js/game/game.js"></script>
+  <script src="js/game/player.js"></script>
+  <script src="js/game/food.js"></script>
+  <script src="js/game/ui.js"></script>
+  <script src="js/game/main.js"></script>
+  <script src="js/navigation.js"></script>
+</body>
+</html>

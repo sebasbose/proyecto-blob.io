@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amigos - Blob.io</title>
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/friends.css">
+  <link rel="stylesheet" href="css/loader.css">
+  <script src="https://kit.fontawesome.com/62f4d88379.js" crossorigin="anonymous"></script>
+  <script src="js/auth-check.js"></script>
+  <script src="js/loader.js"></script>
+</head>
+<body>
+  <!-- Navegación Superior -->
+  <nav class="top-nav">
+    <div class="nav-content">
+      <div class="nav-left">
+        <a href="index.html" class="logo">
+          <h2 class="game-title-small">BLOB.IO</h2>
+        </a>
+      </div>
+      <div class="nav-center">
+        <ul class="nav-links">
+          <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+          <li><a href="leaderboards.html"><i class="fas fa-trophy"></i> Rankings</a></li>
+          <li><a href="profile.html"><i class="fas fa-user"></i> Perfil</a></li>
+          <li><a href="friends.html" class="active"><i class="fas fa-users"></i> Amigos</a></li>
+        </ul>
+      </div>
+      <div class="nav-right">
+        <div class="user-info" id="userInfoDropdown">
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <span class="username">{username}</span>
+          <i class="fas fa-chevron-down dropdown-arrow"></i>
+          <div class="user-dropdown" id="userDropdownMenu">
+            <a href="profile.html" class="dropdown-item">
+              <i class="fas fa-user-circle"></i>
+              <span>Mi Perfil</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item" id="logoutButton">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Cerrar Sesión</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenedor Principal -->
+  <div class="friends-container">
+    <!-- Navegación de Secciones -->
+    <div class="friends-nav">
+      <button class="nav-btn active" data-section="friends">
+        <i class="fas fa-users"></i>
+        <span>Mis Amigos</span>
+        <span class="count-badge">12</span>
+      </button>
+      <button class="nav-btn" data-section="search">
+        <i class="fas fa-search"></i>
+        <span>Buscar</span>
+      </button>
+      <button class="nav-btn" data-section="requests">
+        <i class="fas fa-user-plus"></i>
+        <span>Solicitudes</span>
+        <span class="count-badge notification">3</span>
+      </button>
+      <button class="nav-btn" data-section="blocked">
+        <i class="fas fa-user-slash"></i>
+        <span>Bloqueados</span>
+      </button>
+    </div>
+
+    <!-- Sección: Mis Amigos -->
+    <div class="friends-section active" id="friends-section">
+      <div class="section-header">
+        <h2>Mis Amigos (0)</h2>
+      </div>
+
+      <div class="friends-grid" id="friendsList">
+        <!-- Se llenará dinámicamente -->
+      </div>
+    </div>
+
+    <!-- Sección: Buscar Amigos -->
+    <div class="friends-section" id="search-section">
+      <div class="section-header">
+        <h2>Buscar Jugadores</h2>
+      </div>
+
+      <div class="search-container">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Buscar por nombre de usuario...">
+          <button class="search-btn" id="searchBtn">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="search-results" id="searchResults">
+        <!-- Se llenará dinámicamente -->
+      </div>
+    </div>
+
+    <!-- Sección: Solicitudes de Amistad -->
+    <div class="friends-section" id="requests-section">
+      <div class="section-header">
+        <h2>Solicitudes de Amistad</h2>
+        <div class="requests-actions">
+          <button class="action-btn secondary" id="acceptAllBtn">
+            <i class="fas fa-check-double"></i>
+            Aceptar todas
+          </button>
+          <button class="action-btn danger" id="rejectAllBtn">
+            <i class="fas fa-times"></i>
+            Rechazar todas
+          </button>
+        </div>
+      </div>
+
+      <!-- Solicitudes Recibidas -->
+      <div class="requests-subsection">
+        <h3>Solicitudes Recibidas (3)</h3>
+        <div class="requests-list" id="incomingRequests">
+          <!-- Se llenará dinámicamente -->
+        </div>
+      </div>
+
+      <!-- Solicitudes Enviadas -->
+      <div class="requests-subsection">
+        <h3>Solicitudes Enviadas (2)</h3>
+        <div class="requests-list" id="outgoingRequests">
+          <!-- Se llenará dinámicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Jugadores Bloqueados -->
+    <div class="friends-section" id="blocked-section">
+      <div class="section-header">
+        <h2>Jugadores Bloqueados</h2>
+        <p class="section-description">Funcionalidad próximamente disponible.</p>
+      </div>
+
+      <div class="blocked-list" id="blockedList">
+        <!-- Se llenará dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toastContainer">
+    <!-- Las notificaciones aparecerán aquí -->
+  </div>
+  
+  <!-- Footer -->
+  <footer class="page-footer">
+    <div class="footer-content">
+      <p>&copy; 2025 Blob.io - Desarrollado para CI-0137 Desarrollo Web</p>
+      <div class="footer-links">
+        <!-- <a href="#"><i class="fab fa-github"></i></a>
+        <a href="#"><i class="fab fa-discord"></i></a> -->
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/friends.js"></script>
+</body>
+</html>
