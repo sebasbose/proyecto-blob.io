@@ -3,7 +3,7 @@ class ProfileManager {
   constructor() {
     this.currentTab = 'overview';
     this.userData = null;
-    this.achievements = this.generateMockAchievements();
+    this.achievements = [];
     this.matchHistory = [];
     this.init();
   }
@@ -65,13 +65,13 @@ class ProfileManager {
   async loadGlobalRank() {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('/api/leaderboard', {
+        const response = await fetch(`/api/leaderboard/rank/${this.userData._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
             const leaderboard = await response.json();
-            const userRank = leaderboard.findIndex(u => u._id === this.userData._id);
-            this.userData.globalRank = userRank >= 0 ? userRank + 1 : 0;
+            const userRank = leaderboard['rank'];
+            this.userData.globalRank = userRank;
         }
     } catch (error) {
         console.error('Error loading rank:', error);
@@ -122,15 +122,6 @@ class ProfileManager {
     const mins = Math.floor(minutes);
     const secs = Math.floor((minutes - mins) * 60);
     return `${mins}m ${secs}s`;
-  }
-
-  generateMockAchievements() {
-    return [
-      { id: 1, name: 'Rey del Blob', description: 'Alcanza el primer lugar 5 veces', icon: 'fas fa-crown', rarity: 'gold', unlocked: false, progress: 0, maxProgress: 5 },
-      { id: 2, name: 'Comedor Experto', description: 'Come 1000 puntos de comida', icon: 'fas fa-target', rarity: 'silver', unlocked: false, progress: 0, maxProgress: 1000 },
-      { id: 3, name: 'Novato', description: 'Completa tu primera partida', icon: 'fas fa-baby', rarity: 'bronze', unlocked: false, progress: 0, maxProgress: 1 },
-      { id: 4, name: 'Ganador', description: 'Gana 10 partidas', icon: 'fas fa-trophy', rarity: 'gold', unlocked: false, progress: 0, maxProgress: 10 }
-    ];
   }
 
   setupEventListeners() {
