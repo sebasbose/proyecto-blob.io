@@ -85,13 +85,15 @@ function initLoginForm() {
                 localStorage.setItem('token', data.token);
                 
                 if (window.PageLoader) {
-                    PageLoader.updateMessage('¡Inicio exitoso!', 'Redirigiendo al juego...');
+                    PageLoader.updateMessage('¡Inicio exitoso!', 'Redirigiendo...');
                 }
                 showMessage('¡Inicio de sesión exitoso!', 'success');
                 
-                // Redirigir al juego después de un breve delay
+                // Redirigir a la página original o al index
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    const redirectTo = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+                    sessionStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectTo;
                 }, 1500);
             } else {
                 if (window.PageLoader) {

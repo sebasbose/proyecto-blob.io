@@ -104,7 +104,12 @@ class NavigationManager {
 
   logout() {
     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-      API_CONFIG.logout();
+      // Usar AuthCheck si está disponible, sino usar API_CONFIG
+      if (window.AuthCheck) {
+        AuthCheck.logout();
+      } else {
+        API_CONFIG.logout();
+      }
     }
   }
 }

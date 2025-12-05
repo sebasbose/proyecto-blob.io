@@ -163,3 +163,50 @@
   margin-bottom: 15px;
   border-radius: 4px;
 }
+
+/* Indicador de estado de autenticación */
+.auth-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 8px 15px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85em;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.auth-indicator.show {
+  display: flex;
+}
+
+.auth-indicator.checking {
+  background: rgba(255, 165, 0, 0.7);
+}
+
+.auth-indicator.authenticated {
+  background: rgba(76, 175, 80, 0.7);
+}
+
+.auth-indicator.error {
+  background: rgba(244, 67, 54, 0.7);
+}
+
+.auth-indicator i {
+  font-size: 1em;
+}
+
+@media (max-width: 768px) {
+  .auth-indicator {
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.75em;
+    padding: 6px 12px;
+  }
+}

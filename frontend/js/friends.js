@@ -14,10 +14,11 @@ class FriendsManager {
     // Mostrar loader
     PageLoader.show('Cargando Sistema de Amigos...', 'Conectando con el servidor');
 
-    // Verificar autenticación
+    // La autenticación ya fue verificada por auth-check.js
+    // Solo hacer una verificación adicional por seguridad
     if (!API_CONFIG.isAuthenticated()) {
+      console.warn('Usuario no autenticado detectado en friends.js');
       PageLoader.hide(0);
-      window.location.href = 'login.html';
       return;
     }
 
