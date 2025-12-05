@@ -11,17 +11,31 @@ class FriendsManager {
   }
 
   async init() {
+    // Mostrar loader
+    PageLoader.show('Cargando Sistema de Amigos...', 'Conectando con el servidor');
+
     // Verificar autenticación
     if (!API_CONFIG.isAuthenticated()) {
+      PageLoader.hide(0);
       window.location.href = 'login.html';
       return;
     }
 
-    this.setupEventListeners();
-    await this.loadAllData();
-    this.loadSection(this.currentSection);
-    this.updateNavigationCounts();
-    this.updateUserInfo();
+    try {
+      this.setupEventListeners();
+      PageLoader.updateMessage('Cargando tus amigos...', 'Obteniendo datos');
+      await this.loadAllData();
+      this.loadSection(this.currentSection);
+      this.updateNavigationCounts();
+      await this.updateUserInfo();
+      
+      // Ocultar loader cuando todo esté listo
+      PageLoader.hide();
+    } catch (error) {
+      console.error('Error initializing friends:', error);
+      PageLoader.hide(0);
+      this.showToast('Error al cargar el sistema de amigos', 'error');
+    }
   }
 
   async updateUserInfo() {

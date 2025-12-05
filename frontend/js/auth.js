@@ -53,6 +53,11 @@ function initLoginForm() {
         submitBtn.classList.add('loading');
         submitBtn.disabled = true;
         
+        // Mostrar loader de página
+        if (window.PageLoader) {
+            PageLoader.show('Iniciando sesión...', 'Validando credenciales');
+        }
+        
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -79,6 +84,9 @@ function initLoginForm() {
                 localStorage.setItem('currentUser', JSON.stringify(data));
                 localStorage.setItem('token', data.token);
                 
+                if (window.PageLoader) {
+                    PageLoader.updateMessage('¡Inicio exitoso!', 'Redirigiendo al juego...');
+                }
                 showMessage('¡Inicio de sesión exitoso!', 'success');
                 
                 // Redirigir al juego después de un breve delay
@@ -86,6 +94,9 @@ function initLoginForm() {
                     window.location.href = 'index.html';
                 }, 1500);
             } else {
+                if (window.PageLoader) {
+                    PageLoader.hide(0);
+                }
                 showMessage(data.message || 'Error al iniciar sesión', 'error');
                 submitBtn.textContent = originalText;
                 submitBtn.classList.remove('loading');
@@ -144,6 +155,11 @@ function initRegisterForm() {
         submitBtn.classList.add('loading');
         submitBtn.disabled = true;
         
+        // Mostrar loader de página
+        if (window.PageLoader) {
+            PageLoader.show('Creando tu cuenta...', 'Configurando tu perfil');
+        }
+        
         try {
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
@@ -156,6 +172,9 @@ function initRegisterForm() {
             const data = await response.json();
 
             if (response.ok) {
+                if (window.PageLoader) {
+                    PageLoader.updateMessage('¡Cuenta creada!', 'Redirigiendo al login...');
+                }
                 showMessage('¡Cuenta creada exitosamente!', 'success');
                 
                 // Redirigir al login después de un breve delay
@@ -163,6 +182,9 @@ function initRegisterForm() {
                     window.location.href = 'login.html';
                 }, 1500);
             } else {
+                if (window.PageLoader) {
+                    PageLoader.hide(0);
+                }
                 showMessage(data.message || 'Error al crear la cuenta', 'error');
                 submitBtn.textContent = originalText;
                 submitBtn.classList.remove('loading');
@@ -170,6 +192,9 @@ function initRegisterForm() {
             }
         } catch (error) {
             console.error('Error:', error);
+            if (window.PageLoader) {
+                PageLoader.hide(0);
+            }
             showMessage('Error de conexión con el servidor', 'error');
             submitBtn.textContent = originalText;
             submitBtn.classList.remove('loading');

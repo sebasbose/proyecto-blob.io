@@ -5,6 +5,11 @@ let game;
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Blob.io - Inicializando aplicación...');
   
+  // Mostrar loader
+  if (window.PageLoader) {
+    PageLoader.show('Iniciando Blob.io...', 'Preparando el juego');
+  }
+  
   try {
     // Verificar si el usuario está autenticado
     checkAuthenticationStatus();
@@ -23,8 +28,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('Blob.io - Aplicación inicializada correctamente');
     
+    // Ocultar loader
+    if (window.PageLoader) {
+      PageLoader.hide();
+    }
+    
   } catch (error) {
     console.error('Error inicializando la aplicación:', error);
+    if (window.PageLoader) {
+      PageLoader.hide(0);
+    }
     showCriticalError('Error al inicializar el juego. Por favor, recarga la página.');
   }
 });

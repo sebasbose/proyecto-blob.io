@@ -9,12 +9,29 @@ class ProfileManager {
   }
 
   async init() {
-    await this.fetchUserData();
-    this.setupEventListeners();
-    if (this.userData) {
+    // Mostrar loader
+    if (window.PageLoader) {
+      PageLoader.show('Cargando tu perfil...', 'Obteniendo tus estadísticas');
+    }
+
+    try {
+      await this.fetchUserData();
+      this.setupEventListeners();
+      if (this.userData) {
         this.updateProfileDisplay();
         this.setupTabNavigation();
         this.initializeCharts();
+      }
+      
+      // Ocultar loader
+      if (window.PageLoader) {
+        PageLoader.hide();
+      }
+    } catch (error) {
+      console.error('Error initializing profile:', error);
+      if (window.PageLoader) {
+        PageLoader.hide(0);
+      }
     }
   }
 

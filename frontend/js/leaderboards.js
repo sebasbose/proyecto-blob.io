@@ -7,14 +7,27 @@ class LeaderboardsManager {
     this.playersPerPage = 10;
     this.searchQuery = '';
     
-    this.mockData = []; // Se llenará con la API
+    this.leaderboardData = []; // Se llenará con la API
     this.init();
   }
 
   async init() {
-    this.setupEventListeners();
-    await this.fetchLeaderboardData();
-    this.updateGlobalStats();
+    // Mostrar loader
+    PageLoader.show('Cargando Rankings...', 'Obteniendo mejores jugadores');
+
+    try {
+      this.setupEventListeners();
+      await this.fetchLeaderboardData();
+      this.updateGlobalStats();
+      
+      // Ocultar loader
+      PageLoader.hide();
+    } catch (error) {
+      console.error('Error initializing leaderboards:', error);
+      if (window.PageLoader) {
+        PageLoader.hide(0);
+      }
+    }
   }
 
   async fetchLeaderboardData() {
@@ -30,7 +43,7 @@ class LeaderboardsManager {
         
         if (response.ok) {
             const data = await response.json();
-            this.mockData = data.users.map(user => ({
+            this.leaderboardData = data.users.map(user => ({
                 id: user._id,
                 name: user.username,
                 maxScore: user.stats?.maxScore || 0,
@@ -49,12 +62,11 @@ class LeaderboardsManager {
             this.updateLeaderboard();
         } else {
             console.error('Error al cargar leaderboard:', response.statusText);
-            this.generateMockData();
+            // Fallback a datos mock si falla la API
         }
     } catch (error) {
         console.error('Error fetching leaderboard:', error);
         // Fallback a datos mock si falla la API
-        this.generateMockData();
     }
   }
 
@@ -68,25 +80,6 @@ class LeaderboardsManager {
         }
     } catch (error) {
         console.error('Error fetching global stats:', error);
-    }
-  }
-
-  generateMockData() {
-    // Datos de respaldo en caso de error
-    this.mockData = [];
-    for (let i = 0; i < 50; i++) {
-      this.mockData.push({
-        id: i + 1,
-        name: `Player${i + 1}`,
-        maxScore: Math.floor(Math.random() * 200000) + 10000,
-        wins: Math.floor(Math.random() * 100),
-        totalTime: Math.floor(Math.random() * 200) + 10,
-        lastActive: 'Hoy',
-        level: Math.floor(Math.random() * 50) + 1,
-        avatar: `linear-gradient(45deg, hsl(${Math.random() * 360}, 70%, 60%), hsl(${Math.random() * 360}, 70%, 60%))`,
-        isOnline: Math.random() > 0.7,
-        country: '🌎'
-      });
     }
   }
 
@@ -177,7 +170,7 @@ class LeaderboardsManager {
   }
 
   getFilteredData() {
-    let data = [...this.mockData];
+    let data = [...this.leaderboardData];
 
     // Filtrar por búsqueda
     if (this.searchQuery) {
@@ -320,10 +313,10 @@ class LeaderboardsManager {
     } else {
       // Fallback a estadísticas simuladas si no hay datos
       const stats = {
-        totalPlayers: this.mockData.length,
-        totalMatches: this.mockData.length * 10,
-        totalTime: Math.floor(this.mockData.reduce((sum, p) => sum + p.totalTime, 0)),
-        averageScore: this.mockData.length > 0 ? Math.floor(this.mockData.reduce((sum, p) => sum + p.maxScore, 0) / this.mockData.length) : 0
+        totalPlayers: this.leaderboardData.length,
+        totalMatches: this.leaderboardData.length * 10,
+        totalTime: Math.floor(this.leaderboardData.reduce((sum, p) => sum + p.totalTime, 0)),
+        averageScore: this.leaderboardData.length > 0 ? Math.floor(this.leaderboardData.reduce((sum, p) => sum + p.maxScore, 0) / this.leaderboardData.length) : 0
       };
 
       const statNumbers = document.querySelectorAll('.stat-number');
@@ -356,7 +349,7 @@ class LeaderboardsManager {
           <div class="player-stats-modal">
             <div class="stat-row">
               <span class="stat-label">Ranking:</span>
-              <span class="stat-value">#${this.mockData.indexOf(player) + 1}</span>
+              <span class="stat-value">#${this.leaderboardData.indexOf(player) + 1}</span>
             </div>
             <div class="stat-row">
               <span class="stat-label">Puntuación Máxima:</span>
@@ -409,7 +402,7 @@ class LeaderboardsManager {
   startRealTimeUpdates() {
     setInterval(() => {
       // Simular cambios en estado en línea
-      this.mockData.forEach(player => {
+      this.leaderboardData.forEach(player => {
         if (Math.random() < 0.1) { // 10% de probabilidad de cambio
           player.isOnline = !player.isOnline;
           if (player.isOnline) {
